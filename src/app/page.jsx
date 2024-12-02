@@ -172,15 +172,20 @@ export default function BlogList() {
               <span>文章数</span>
               <span className="text-2xl font-bold flex justify-center">{totalPosts}</span>
             </div>
-            <div className="flex justify-between cursor-pointer w-1/2">
+            <div className="flex justify-between cursor-pointer w-2/3">
               <a href="https://github.com/ACHamster" target="_blank" className="hover:animate-svgSpain">
-                <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github" />
+                <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github"/>
               </a>
               <a href="https://discord.com/users/964855306293243904" target="_blank" className="hover:animate-svgSpain">
-                <img src="/svg/discord.svg" className="w-6 h-6 hover:fill-[#757cef]" alt="discord" />
+                <img src="/svg/discord.svg" className="w-6 h-6 hover:fill-[#757cef]" alt="discord"/>
               </a>
-              <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank" className="hover:animate-svgSpain">
-                <img src="/svg/steam.svg" className="w-6 h-6" alt="steam" />
+              <a href="mailto:motets_gram_0i@icloud.com"
+                 className="hover:animate-svgSpain">
+                <img src="/svg/mail-fill.svg" className="w-6 h-6" alt="steam"/>
+              </a>
+              <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank"
+                 className="hover:animate-svgSpain">
+                <img src="/svg/steam.svg" className="w-6 h-6" alt="steam"/>
               </a>
             </div>
           </div>
