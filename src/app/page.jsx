@@ -10,18 +10,25 @@ import '@/styles/noise.css';
 
 export default function BlogList() {
   const [posts, setPosts] = useState([]);
+  const [totalPosts, setTotalPosts] = useState(0);
   const mainPageRef = useRef();
   const navRef = useRef();
   const titleRef = useRef();
+  const scrollHandler = () => {
+    mainPageRef.current.scrollIntoView({ behavior: 'smooth' });
+  };
   useEffect(() => {
     async function fetchPosts() {
       const allPosts = await getAllPosts();
       setPosts(allPosts);
+      setTotalPosts(allPosts.length);
     }
     fetchPosts();
   }, []);
   gsap.registerPlugin(ScrollTrigger);
   useGSAP(() => {
+    // 不同设备的缩放倍率
+    const scaleValue = window.innerWidth < 768 ? 1.3 : 3;
     // 控制header背景和文字颜色动画
     gsap.to(navRef.current, {
       background: 'rgba(255,255,254,0,7)',
@@ -46,7 +53,7 @@ export default function BlogList() {
     gsap.set(titleRef.current, {
       x: '44vw',
       y: '50vh',
-      scale: 3,
+      scale: scaleValue,
     });
     gsap.to(titleRef.current, {
       x: '0',
@@ -71,17 +78,20 @@ export default function BlogList() {
             className="flex justify-between w-screen fixed top-0 z-20 ext-slate-50 text-slate-50"
           >
             <div
-              className="left-0 m-2  text-2xl font-clashDisplay"
+              className="left-0 m-2 text-xl  lg:text-2xl font-clashDisplay"
               ref={titleRef}
             >
               <Link href="/">AChamster  Blog</Link>
             </div>
-            <nav className="right-0 m-2 flex space-x-5 text-lg font-extralight font-clashDisplay">
+            <nav className="hidden lg:flex right-0 m-2  space-x-5 text-lg font-extralight font-clashDisplay">
               <Link href="/">Test</Link>
               <Link href="/blog">Blog</Link>
               <Link href="/about">About</Link>
             </nav>
           </header>
+          <div className="cursor-pointer" onClick={scrollHandler}>
+            <img src="/svg/arrow.svg" alt="arrow" className="absolute w-8 h-8 bottom-10 left-1/2" />
+          </div>
         </div>
       </section>
       <section
@@ -151,14 +161,29 @@ export default function BlogList() {
           </div>
         )}
         <div className="w-0 h-96 lg:w-1/5 flex justify-center rounded-lg shadow-md hover:shadow-lg bg-white sticky top-20 ml-16 overflow-hidden z-10">
-          <Link href="/about" className="flex justify-center content-center flex-wrap w-3/4 text-primaryTextColor">
+          <div className="flex justify-center content-around flex-wrap w-3/4 h-3/4 mt-10 text-primaryTextColor">
             <div className="flex justify-center w-32 h-32">
               <img src="/avatar.png" className="overflow-hidden w-full h-full rounded-full" alt="avatar" />
             </div>
-            <div className="flex justify-center w-full text-lg font-noto font-bold">
-              AChamster
+            <div className="flex justify-center w-full text-lg font-noto font-bold hover:text-sky-600 hover:animate-blink">
+              <Link href="/about">AChamster</Link>
             </div>
-          </Link>
+            <div className="flex flex-wrap flex-col content-center w-full">
+              <span>文章数</span>
+              <span className="text-2xl font-bold flex justify-center">{totalPosts}</span>
+            </div>
+            <div className="flex justify-between cursor-pointer w-1/2">
+              <a href="https://github.com/ACHamster" target="_blank" className="hover:animate-svgSpain">
+                <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github" />
+              </a>
+              <a href="https://discord.com/users/964855306293243904" target="_blank" className="hover:animate-svgSpain">
+                <img src="/svg/discord.svg" className="w-6 h-6 hover:fill-[#757cef]" alt="discord" />
+              </a>
+              <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank" className="hover:animate-svgSpain">
+                <img src="/svg/steam.svg" className="w-6 h-6" alt="steam" />
+              </a>
+            </div>
+          </div>
         </div>
       </section>
     </>

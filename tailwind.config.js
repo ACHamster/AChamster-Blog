@@ -18,6 +18,20 @@ module.exports = {
         primaryTextColor: "rgb(61,59,59)",
         myGrey: '#fffffe',
       },
+      keyframes: {
+        blink: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0 },
+        },
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+      },
+      animation: {
+        blink: 'blink 0.15s infinite',
+        svgSpain: 'spin 0.5s',
+      },
     },
   },
   plugins: [],
