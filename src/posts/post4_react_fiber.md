@@ -3,7 +3,7 @@ title: 'React Fiber 学习笔记'
 date: '2024-03-18'
 tags: ['web', 'React']
 excerpt: '我对fiber的简单理解'
-cover: '/covers/cover2'
+cover: '/covers/cover2.png'
 ---
 
 ### 为什么需要Fiber架构
