@@ -1,0 +1,57 @@
+@layer theme, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+
+
+.tiptap code:not(pre code) {
+    @apply bg-[#EDEDEB] rounded-[0.4rem] text-[#DA615C] text-sm px-[0.3em] py-[0.25em];
+}
+
+.prose pre {
+    @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto font-mono my-2;
+}
+
+.prose pre code {
+    @apply bg-transparent text-inherit text-sm p-0;
+}
+
+.tiptap {
+    /* Heading styles */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.1;
+        margin-top: 2.5rem;
+        text-wrap: pretty;
+    }
+
+    h1,
+    h2 {
+        margin-top: 3.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    h1 {
+        @apply text-5xl
+    }
+
+    h2 {
+        @apply text-3xl
+    }
+
+    h3 {
+        @apply text-2xl
+    }
+
+    h4,
+    h5,
+    h6 {
+        @apply text-xl
+    }
+}
+
