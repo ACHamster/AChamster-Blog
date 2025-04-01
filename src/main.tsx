@@ -7,6 +7,8 @@ import AdminPage from "./pages/admin-page";
 import CreatePost from "./pages/admin-page/components/create-post";
 import DashBoard from "@/pages/admin-page/components/dashboard";
 import ArticleDetail from "@/pages/article-detail";
+import ProtectedRoute from "@/route/ProtectedRoute.tsx";
+import Login from "@/components/login";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -14,7 +16,8 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/blog/:id" element={<ArticleDetail />} />
-        <Route path="/admin" element={<AdminPage />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>}>
           <Route index element={<DashBoard />} />
           <Route path="newarticle" element={<CreatePost />} />
         </Route>
