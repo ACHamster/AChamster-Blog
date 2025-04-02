@@ -16,7 +16,7 @@ createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/blog/:id" element={<ArticleDetail />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/adminlogin" element={<Login />} />
         <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>}>
           <Route index element={<DashBoard />} />
           <Route path="newarticle" element={<CreatePost />} />

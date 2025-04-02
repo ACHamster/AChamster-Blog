@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router"
+import apiClient from "@/lib/api.ts";
 
 export function LoginForm({
                             className,
@@ -23,41 +24,30 @@ export function LoginForm({
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError("")
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "登录失败")
-      }
-
+      const response = await apiClient.post("/auth/signin", {
+        email,
+        password
+      });
 
       // 登录成功，跳转到admin页面
-      navigate("/admin")
+      navigate("/admin");
     } catch (err: any) {
-      setError(err.message || "登录过程中出现错误")
+      setError(err.message || "登录过程中出现错误");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>登录账户以继续</CardTitle>
+          <CardTitle>登录管理员账户以继续</CardTitle>
           <CardDescription>
             输入您的邮箱和密码登录
           </CardDescription>
@@ -84,12 +74,6 @@ export function LoginForm({
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">密码</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    忘记密码?
-                  </a>
                 </div>
                 <Input
                   id="password"
@@ -103,16 +87,7 @@ export function LoginForm({
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "登录中..." : "登录"}
                 </Button>
-                <Button variant="outline" className="w-full" type="button">
-                  使用谷歌账号登录
-                </Button>
               </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              没有账号?{" "}
-              <a href="#" className="underline underline-offset-4">
-                注册
-              </a>
             </div>
           </form>
         </CardContent>
@@ -120,3 +95,4 @@ export function LoginForm({
     </div>
   )
 }
+
