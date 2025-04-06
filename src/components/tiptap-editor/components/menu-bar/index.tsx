@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button.tsx";
 import {Editor} from "@tiptap/react";
 import React, {useState} from "react";
-import axios from "axios";
+import apiClient from "@/lib/api"; // 替换axios导入为apiClient
 import {
   Drawer,
   DrawerClose,
@@ -12,66 +12,202 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-
+import {toast} from "sonner";
+import {Input} from "@/components/ui/input.tsx";
+import {Label} from "@/components/ui/label.tsx";
+import {Progress} from "@/components/ui/progress.tsx";
 
 interface MenuBarProps {
   editor: Editor | null;
+  imageState?: Record<string, File>;
+  setImageState?: React.Dispatch<React.SetStateAction<Record<string, File>>>;
+  title?: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Article {
   content: object;
   title: string;
   description?: string;
+  cover?: string;
 }
 
+interface UploadStatus {
+  uploading: boolean;
+  progress: number;
+  total: number;
+  current: number;
+}
 
-export const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
-  const [title, setTitle] = useState<string>("未命名文章");
+export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setImageState, title, setTitle }) => {
   const [desc, setDesc] = useState<string>("");
+  const [isPublishing, setIsPublishing] = useState<boolean>(false);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string>("");
+  const [uploadStatus, setUploadStatus] = useState<UploadStatus>({
+    uploading: false,
+    progress: 0,
+    total: 0,
+    current: 0
+  });
 
   if (!editor) {
     return null;
   }
 
-  const handleBasicInfo = () => {
-    const content = editor.getJSON();
-
-    // 查找第一个 level 1 的标题
-    const firstHeading = content.content?.find(
-      node => node.type === 'heading' && (node.attrs as { level: number }).level === 1
-    );
-
-    if (firstHeading?.content?.[0]?.text) {
-      setTitle(firstHeading.content[0].text);
+  const uploadImageToB2 = async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await apiClient.post('/storage/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // 修改Content-Type以适应文件上传
+        },
+      });
+      return response.data.cdnUrl;
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      // 不再返回null，而是抛出错误
+      throw new Error('图片上传失败');
     }
-  }
+  };
 
   const handlePush = async () => {
+    setIsPublishing(true);
 
     try {
+      // 处理文章图片上传
+      if (Object.keys(imageState).length > 0 && setImageState) {
+        const content = editor.getHTML();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(content, 'text/html');
+        const images = doc.querySelectorAll('img[data-image-id]')
+        const totalImages = images.length;
+
+        let uploadFailures = 0;
+
+        setUploadStatus({
+          uploading: true,
+          progress: 0,
+          total: totalImages,
+          current: 0
+        });
+
+        // 修改上传逻辑以单独处理每个上传并记录失败
+        for (const [index, img] of Array.from(images).entries()) {
+          const imageId = img.getAttribute('data-image-id');
+          if (imageId && imageState[imageId]) {
+            const file = imageState[imageId];
+            try {
+              const permanentUrl = await uploadImageToB2(file);
+
+              setUploadStatus(prev => ({
+                ...prev,
+                current: index + 1,
+                progress: Math.floor(index + 1/totalImages * 100),
+              }));
+              // 防止undefined或空字符串
+              if (permanentUrl && permanentUrl.trim() !== '') {
+                img.setAttribute('src', permanentUrl);
+                img.removeAttribute('data-image-id');
+              } else {
+                console.error('获取到的URL无效:', permanentUrl);
+                uploadFailures++;
+              }
+            } catch (error) {
+              console.error('图片上传失败:', error);
+              uploadFailures++;
+            }
+          }
+        }
+        // 重置上传状态
+        setUploadStatus({
+          uploading: false,
+          progress: 0,
+          total: 0,
+          current: 0
+        });
+
+        // 如果有任何图片上传失败，则中止发布流程
+        if (uploadFailures > 0) {
+          toast(`${uploadFailures} 张图片上传失败，请重试`);
+          setIsPublishing(false);
+          return;
+        }
+
+        // 用处理后的HTML更新编辑器内容
+        editor.commands.setContent(doc.body.innerHTML);
+
+        // 清空临时图片状态
+        setImageState({});
+      }
+
+      // 处理封面图上传
+      let coverImageUrl = "";
+      if (coverImage) {
+        setUploadStatus({
+          uploading: true,
+          progress: 0,
+          total: 1,
+          current: 1
+        });
+
+        try {
+          coverImageUrl = await uploadImageToB2(coverImage);
+        } catch (error) {
+          console.error('封面图上传失败:', error);
+          toast("封面图上传失败，请重试");
+          setIsPublishing(false);
+          setUploadStatus({
+            uploading: false,
+            progress: 0,
+            total: 0,
+            current: 0,
+          });
+          return;
+        }
+      }
+
+      setUploadStatus({
+        uploading: false,
+        progress: 0,
+        total: 0,
+        current: 0,
+      });
+
+      // 获取最终内容并提交
       const content = editor.getJSON();
 
       const articleData: Article = {
         title: title || "未命名标题",
         description: desc,
         content: content,
+        cover: coverImageUrl || undefined,
       };
 
-      const response = await axios.post('/api/posts', articleData, {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await apiClient.post('/posts', articleData);
 
       if (response.status === 201) {
         // 成功处理
-        console.log('Article created successfully');
+        toast("文章发布成功");
       }
     } catch (error) {
       // 错误处理
       console.error('Failed to create article:', error);
+      toast("发布文章失败，请重试");
+    } finally {
+      setIsPublishing(false);
     }
   };
+
+  const handleCoverImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      setCoverImage(file);
+      const previewUrl = URL.createObjectURL(file);
+      setCoverImagePreview(previewUrl);
+    }
+  }
 
   return (
     <div className="toolbar flex gap-2 mb-4">
@@ -114,7 +250,6 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
             variant="outline"
             className="bg-primary text-white hover:text-primary"
             size={"sm"}
-            onClick={() => handleBasicInfo()}
           >
             发布
           </Button>
@@ -138,11 +273,46 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor }) => {
               placeholder="文章概述"
               className="w-full border rounded-md p-2"
             />
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="picture">文章封面</Label>
+              <Input
+                id="picture"
+                type="file"
+                onChange={handleCoverImageChange}
+              />
+              {coverImagePreview && (
+                <div className="mt-2 w-64 aspect-auto">
+                  <img
+                    src={coverImagePreview}
+                    alt="封面预览"
+                    className="max-h-40 rounded-md border"
+                  />
+                </div>
+              )}
+            </div>
+            {/*上传进度条*/}
+            {uploadStatus.uploading && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>正在上传图片 ({uploadStatus.current}/{uploadStatus.total})</span>
+                  <span>{uploadStatus.progress}%</span>
+                </div>
+                <Progress value={uploadStatus.progress} className="h-2" />
+                <p className="text-xs text-gray-500">
+                  请勿关闭窗口，等待所有图片上传完成...
+                </p>
+              </div>
+            )}
           </div>
           <DrawerFooter>
-            <Button onClick={() => handlePush()}>Submit</Button>
-            <DrawerClose>
-              <Button variant="outline">Cancel</Button>
+            <Button
+              onClick={() => handlePush()}
+              disabled={isPublishing}
+            >
+              {isPublishing ? "正在发布..." : "发布"}
+            </Button>
+            <DrawerClose asChild>
+              <Button variant="outline">取消</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>

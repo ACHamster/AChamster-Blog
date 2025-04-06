@@ -56,5 +56,32 @@ export const refreshToken = async () => {
   }
 };
 
+/**
+ * 获取文章列表
+ * @returns {Promise<{success: boolean, data?: Post[], error?: any}>} 返回文章列表或错误信息
+ */
+export const fetchPosts = async () => {
+  try {
+    const response = await apiClient.get('/posts/list');
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
+/**
+ * 获取单篇文章详情
+ * @param {string | number} id 文章ID
+ * @returns {Promise<{success: boolean, data?: any, error?: any}>} 返回文章详情或错误信息
+ */
+export const fetchPostById = async (id: string | number) => {
+  try {
+    const response = await apiClient.get(`/posts/${id}`);
+    return { success: true, data: response.data };
+  } catch (error) {
+    return { success: false, error };
+  }
+};
+
 export default apiClient;
 

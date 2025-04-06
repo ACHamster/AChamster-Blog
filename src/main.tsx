@@ -9,6 +9,7 @@ import DashBoard from "@/pages/admin-page/components/dashboard";
 import ArticleDetail from "@/pages/article-detail";
 import ProtectedRoute from "@/route/ProtectedRoute.tsx";
 import Login from "@/components/login";
+import {Toaster} from "@/components/ui/sonner.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,5 +24,6 @@ createRoot(document.getElementById('root')!).render(
         </Route>
       </Routes>
     </BrowserRouter>
+    <Toaster />
   </StrictMode>,
 )
