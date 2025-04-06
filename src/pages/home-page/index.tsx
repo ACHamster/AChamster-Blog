@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import './styles/noise.css';
 import ArticleItem from "./components/acticle-item";
-import axios from "axios";
+import { fetchPosts } from "@/lib/api.ts";
 
 interface Post {
   id: string;
@@ -15,7 +15,6 @@ interface Post {
   excerpt: string;
   cover?: string;
 }
-
 
 const HomePage: React.FC = () => {
   const [totalPosts, setTotalPosts] = useState(0);
@@ -100,16 +99,19 @@ const HomePage: React.FC = () => {
   }, [postList.length]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    const getPosts = async () => {
       try {
-        const response = await axios.get('/api/posts/list');
-        // 假设 response.data 是 Post[] 类型的数组
-        setPostList([...postList, ...response.data]);
+        const response = await fetchPosts();
+        if (response.success) {
+          setPostList([...postList, ...response.data]);
+        } else {
+          console.error('Failed to fetch posts:', response.error);
+        }
       } catch (error) {
         console.error('Failed to fetch posts:', error);
       }
     };
-    fetchPosts();
+    getPosts();
   }, []);
 
   return (
@@ -165,7 +167,7 @@ const HomePage: React.FC = () => {
         <div className="w-0 h-96 lg:w-1/5 flex justify-center rounded-lg shadow-md hover:shadow-lg bg-white sticky top-20 ml-16 overflow-hidden z-10">
           <div className="flex justify-center content-around flex-wrap w-3/4 h-3/4 mt-10 text-primaryTextColor">
             <div className="flex justify-center w-32 h-32">
-              <img src="/img/avatar.png" className="overflow-hidden w-full h-full rounded-full" alt="avatar" />
+              <img src="https://img.achamster.live/uploads/1743758178045-36910976_p0.png" className="overflow-hidden w-full h-full rounded-full" alt="avatar" />
             </div>
             <div className="flex justify-center w-full text-lg font-noto font-bold hover:text-sky-600 hover:animate-bNavLink">
               <NavLink to="/about">AChamster</NavLink>

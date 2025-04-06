@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { EditorContent, useEditor} from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import axios from 'axios';
 import Underline from "@tiptap/extension-underline";
 import {CodeBlockLowlight} from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
 import {all, createLowlight} from "lowlight";
 import "highlight.js/styles/atom-one-dark-reasonable.css";
 import "@/components/tiptap-editor/editor.css";
+import { fetchPostById } from '@/lib/api';
 
 interface ArticleData {
   id: number;
@@ -45,11 +45,16 @@ export default function ArticleDetail() {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await axios.get(`/api/posts/${id}`);
-        setPost(response.data);
-        console.log(response.data);
-        if (editor && response.data.content) {
-          editor.commands.setContent(JSON.parse(response.data.content));
+        setLoading(true);
+        const result = await fetchPostById(id as string);
+        if (result.success) {
+          setPost(result.data);
+          console.log(result.data);
+          if (editor && result.data.content) {
+            editor.commands.setContent(JSON.parse(result.data.content));
+          }
+        } else {
+          console.error('Failed to fetch article:', result.error);
         }
       } catch (error) {
         console.error('Failed to fetch article:', error);
