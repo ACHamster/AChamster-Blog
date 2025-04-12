@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router"
+import { useLocation } from "react-router";
 import apiClient from "@/lib/api.ts";
 
 export function LoginForm({
@@ -21,7 +22,14 @@ export function LoginForm({
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.state?.error) {
+      setError(location.state.error);
+    }
+  }, [location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +37,16 @@ export function LoginForm({
     setError("");
 
     try {
-      // @ts-expect-error 我故意的
-      const response = await apiClient.post("/auth/signin", {
+      await apiClient.post("/auth/signin", {
         email,
         password
       });
 
+      console.log(location.state?.from?.pathname);
       // 登录成功，跳转到admin页面
-      navigate("/admin");
-    } catch (err: any) {
+      const destination = location.state?.from?.pathname;
+      navigate(destination);
+    } catch (err :any) {
       setError(err.message || "登录过程中出现错误");
     } finally {
       setLoading(false);
