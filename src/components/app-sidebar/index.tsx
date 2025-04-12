@@ -1,17 +1,9 @@
-"use client"
-
 import * as React from "react"
 import {
   ArrowUpCircleIcon,
-  CameraIcon,
   List,
-  FileCodeIcon,
   Contact,
-  FileTextIcon,
-  HelpCircleIcon,
   LayoutDashboardIcon,
-  SearchIcon,
-  SettingsIcon,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -40,78 +32,13 @@ const data = {
     },
     {
       title: "文章列表",
-      url: "#",
+      url: "/admin/posts-list",
       icon: List,
     },
     {
       title: "用户管理",
-      url: "#",
+      url: "/admin/users-list",
       icon: Contact,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
     },
   ],
 }
@@ -126,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <a href="/">
                 <ArrowUpCircleIcon className="h-5 w-5" />
                 <span className="text-base font-semibold">AChamster Blog</span>
               </a>

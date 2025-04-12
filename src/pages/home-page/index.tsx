@@ -1,48 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {NavLink} from "react-router";
+import { NavLink, useLocation} from "react-router";
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import './styles/noise.css';
 import ArticleItem from "./components/acticle-item";
-import { fetchPosts } from "@/lib/api.ts";
+import apiClient, {checkLoginStatus, fetchPosts, refreshToken} from "@/lib/api.ts";
+import {
+  DropdownMenu,
+  DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.tsx";
+import { handleLogout } from "@/lib/utils.ts";
+import { allTags } from "@/lib/tags.ts";
+import { includeSomeLine, Lines, mergeLines, NoLines, removeLine } from "@/lib/quick-tag-by-lines.ts";
 
 interface Post {
   id: string;
   title: string;
   date: string;
-  tags?: string[];
+  common_tags?: string[];
+  quick_tag: Lines;
   excerpt: string;
   cover?: string;
 }
 
+interface userInfo {
+  username: string;
+  email: string;
+  avatar: string;
+}
+
 const HomePage: React.FC = () => {
-  const [totalPosts, setTotalPosts] = useState(0);
-  const [postList, setPostList] = useState<Post[]>([
-    {
-      id: "001",
-      title: "React 入门指南：从零开始学习 React",
-      date: "2024-02-15",
-      tags: ["React", "JavaScript", "前端开发"],
-      excerpt: "本文将带你从零开始学习 React，包括基础概念、组件开发、状态管理等核心内容。",
-      cover: "/img/cover1.png"
-    },
-    {
-      id: "002",
-      title: "TypeScript 最佳实践：提升代码质量的关键技巧",
-      date: "2024-02-10",
-      tags: ["TypeScript", "编程技巧"],
-      excerpt: "探索 TypeScript 开发中的最佳实践，包括类型定义、接口设计和高级特性的使用方法。"
-    },
-    {
-      id: "003",
-      title: "TailwindCSS 实战教程：构建现代化 UI",
-      date: "2024-02-05",
-      tags: ["CSS", "TailwindCSS", "UI设计"],
-      excerpt: "学习如何使用 TailwindCSS 快速构建美观的用户界面，掌握响应式设计和组件复用技巧。",
-      cover: "/img/cover2.png"
-    }
-  ]);
+  const location = useLocation();
+
+  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [userInfo, setUserInfo] = useState<userInfo>();
+  const [quickTags, setQuickTags] = useState<Lines>(NoLines);
+  const [postList, setPostList] = useState<Post[]>([]);
   const mainPageRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -101,7 +97,17 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     const getPosts = async () => {
       try {
+        const status = await checkLoginStatus();
+        if (status.data.userId === 0) {
+          // 如果未登录，尝试刷新token
+          await refreshToken();
+        }
+
+        const info = await apiClient(`/user/info/${status.data.userId}`);
+        setUserInfo(info.data);
+
         const response = await fetchPosts();
+        console.log(response);
         if (response.success) {
           setPostList([...postList, ...response.data]);
         } else {
@@ -113,6 +119,13 @@ const HomePage: React.FC = () => {
     };
     getPosts();
   }, []);
+
+  const filteredPosts = quickTags !== NoLines
+    ? postList.filter((post) => {
+      console.log(post.quick_tag);
+      return includeSomeLine(quickTags, post.quick_tag);
+    })
+    : postList;
 
   return (
     <>
@@ -129,10 +142,30 @@ const HomePage: React.FC = () => {
             >
               <NavLink to="/">AChamster  Blog</NavLink>
             </div>
-            <nav className="hidden md:flex right-0 m-2  space-x-5 text-lg font-regular font-clash-display">
-              <NavLink to="/">Test</NavLink>
+            <nav className="hidden md:flex items-center right-0 m-2  space-x-5 text-lg font-regular font-clash-display">
               <NavLink to="/blog">Blog</NavLink>
               <NavLink to="/about">About</NavLink>
+              <div className="flex items-center">
+                {userInfo?.username ?
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <img
+                        src={userInfo?.avatar}
+                        alt="avatar"
+                        className="w-7 h-7 rounded-full"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>我的账户</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>个人档案</DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleLogout}>退出登录</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  :
+                  <NavLink to="/login" state={{ from: location }} replace>登录</NavLink>
+                }
+              </div>
             </nav>
           </header>
           <div className="cursor-pointer" onClick={scrollHandler}>
@@ -142,65 +175,99 @@ const HomePage: React.FC = () => {
       </section>
       <section
         ref={mainPageRef}
-        className="mx-auto px-4 py-8 min-w-screen min-h-screen flex justify-center flex-wrap bg-white relative"
+        className="mx-auto px-4 py-24 min-w-screen min-h-screen relative flex justify-center"
       >
-        <div
-          className="noise-wrapper w-screen h-screen absolute"
-        >
-          <div className="noise" />
-          {/* 博客列表容器 */}
+        {/*噪音背景*/}
+        <div className="noise-wrapper absolute inset-0 overflow-hidden">
+          <div className="noise fixed inset-0"/>
         </div>
-        {postList?.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">还没有博客文章</p>
-            <p className="text-sm text-gray-500 mt-2">
-              请在 posts 目录下添加 .md 文件
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-8 w-8/12">
-            {postList.map((post) => {
-              return <ArticleItem post={post} key={post.id} />;
-            })}
-          </div>
-        )}
-        <div className="w-0 h-96 lg:w-1/5 flex justify-center rounded-lg shadow-md hover:shadow-lg bg-white sticky top-20 ml-16 overflow-hidden z-10">
-          <div className="flex justify-center content-around flex-wrap w-3/4 h-3/4 mt-10 text-primaryTextColor">
-            <div className="flex justify-center w-32 h-32">
-              <img src="https://img.achamster.live/uploads/1743758178045-36910976_p0.png" className="overflow-hidden w-full h-full rounded-full" alt="avatar" />
-            </div>
-            <div className="flex justify-center w-full text-lg font-noto font-bold hover:text-sky-600 hover:animate-bNavLink">
-              <NavLink to="/about">AChamster</NavLink>
-            </div>
-            <div className="flex flex-wrap flex-col content-center w-full">
-              <span>文章数</span>
-              <span className="text-2xl font-bold flex justify-center">{totalPosts}</span>
-            </div>
-            <div className="flex justify-between cursor-pointer w-2/3">
-              <a
-                href="https://github.com/ACHamster"
-                target="_blank"
-                className="hover:animate-svgSpain"
-              >
-                <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github" />
-              </a>
-              <a
-                href="https://discord.gg/pT2ebreb" target="_blank" className="hover:animate-svgSpain">
-                <img src="/svg/discord.svg" className="w-6 h-6 hover:fill-[#757cef]" alt="discord"/>
-              </a>
-              <a
-                href="mailto:motets_gram_0i@icloud.com"
-                className="hover:animate-svgSpain"
-              >
-                <img src="/svg/mail-fill.svg" className="w-6 h-6" alt="steam" />
-              </a>
-              <a
-                href="https://steamcommunity.com/profiles/76561198982850839" target="_blank"
-                className="hover:animate-svgSpain"
-              >
-                <img src="/svg/steam.svg" className="w-6 h-6" alt="steam" />
-              </a>
-            </div>
+
+        {/*主体内容*/}
+        <div className="container mx-2 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-24 gap-6">
+            {/* 左侧搜索和标签 */}
+            <aside className="lg:col-span-5">
+              <div className="bg-white rounded-lg shadow-md p-4 sticky top-24">
+                {/*搜索*/}
+                <div className="mb-4">
+                  <input
+                    type="search"
+                    placeholder="搜索文章..."
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  />
+                </div>
+                {/*标签*/}
+                <div>
+                  <h3 className="font-semibold mb-2">标签</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {allTags.map(tag => (
+                      <button
+                        key={tag.label}
+                        className={`${includeSomeLine(quickTags, tag.line) ? 'bg-sky-200' : 'bg-gray-100' } px-3 py-1 text-sm  rounded-full hover:bg-sky-100`}
+                        onClick={()=>{
+                          if (includeSomeLine(quickTags, tag.line)) {
+                            setQuickTags(removeLine(quickTags, tag.line));
+                          } else {
+                            setQuickTags(mergeLines(quickTags, tag.line));
+                          }
+                        }}
+                      >
+                        {tag.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            {/* 中间文章列表 */}
+            <main className="lg:col-span-14">
+              <div className="space-y-6">
+                {filteredPosts.map((post) => (
+                  <ArticleItem post={post} key={post.id}/>
+                ))}
+              </div>
+            </main>
+
+            {/* 右侧个人信息 */}
+            <aside className="lg:col-span-5">
+              <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+                <div className="flex flex-col items-center">
+                  <div className="w-32 h-32 mb-4">
+                    <img
+                      src="https://img.achamster.live/uploads/1743758178045-36910976_p0.png"
+                      className="w-full h-full rounded-full object-cover"
+                      alt="avatar"
+                    />
+                  </div>
+                  <NavLink
+                    to="/about"
+                    className="text-lg font-bold hover:text-sky-600 hover:animate-bNavLink mb-4"
+                  >
+                    AChamster
+                  </NavLink>
+                  <div className="text-center mb-6">
+                    <span className="block text-gray-600">文章数</span>
+                    <span className="text-2xl font-bold">{totalPosts}</span>
+                  </div>
+                  <div className="flex justify-center gap-4">
+                    <a href="https://github.com/ACHamster" target="_blank" className="hover:animate-svgSpain">
+                      <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github"/>
+                    </a>
+                    <a href="https://discord.gg/pT2ebreb" target="_blank" className="hover:animate-svgSpain">
+                      <img src="/svg/discord.svg" className="w-6 h-6" alt="discord"/>
+                    </a>
+                    <a href="mailto:motets_gram_0i@icloud.com" className="hover:animate-svgSpain">
+                      <img src="/svg/mail-fill.svg" className="w-6 h-6" alt="mail"/>
+                    </a>
+                    <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank"
+                       className="hover:animate-svgSpain">
+                      <img src="/svg/steam.svg" className="w-6 h-6" alt="steam"/>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>

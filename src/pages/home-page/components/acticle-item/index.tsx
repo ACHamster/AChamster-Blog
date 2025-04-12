@@ -5,7 +5,7 @@ interface Post {
   id: string;
   title: string;
   date: string;
-  tags?: string[];
+  common_tags?: string[];
   excerpt: string;
   cover?: string;
 }
@@ -18,7 +18,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({ post }) => {
   return (
     <article
       key={post.id}
-      className="w-full bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow z-10"
+      className="w-full h-72 bg-white rounded-lg shadow-md mb-8 p-6 hover:shadow-lg transition-shadow z-10"
     >
       <NavLink
         to={`/blog/${post.id}`}
@@ -34,9 +34,9 @@ const ArticleItem: React.FC<ArticleItemProps> = ({ post }) => {
               month: 'long',
               day: 'numeric',
             })}
-            {post.tags && (
+            {post.common_tags && (
               <div className="mt-2 flex gap-2">
-                {post.tags.map((tag :string) => (
+                {post.common_tags.map((tag :string) => (
                   <span
                     key={tag}
                     className="bg-gray-100 px-2 py-1 rounded-full text-sm"
@@ -53,7 +53,7 @@ const ArticleItem: React.FC<ArticleItemProps> = ({ post }) => {
           </span>
         </div>
         {post.cover && (
-          <div className="w-72 h-48 rounded-lg">
+          <div className="w-72 h-48 ml-2 rounded-lg">
             <img src={post.cover} className="w-full h-full object-cover rounded-lg" alt="cover"/>
           </div>
         )}

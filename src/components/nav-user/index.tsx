@@ -1,6 +1,4 @@
 import {
-  BellIcon,
-  CreditCardIcon,
   LogOutIcon,
   MoreVerticalIcon,
   UserCircleIcon,
@@ -27,6 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import {handleLogout} from "@/lib/utils.ts";
 
 export function NavUser({
                           user,
@@ -87,19 +86,11 @@ export function NavUser({
                 <UserCircleIcon />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />
-              Log out
+              退出登录
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

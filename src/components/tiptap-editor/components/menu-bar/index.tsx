@@ -16,6 +16,9 @@ import {toast} from "sonner";
 import {Input} from "@/components/ui/input.tsx";
 import {Label} from "@/components/ui/label.tsx";
 import {Progress} from "@/components/ui/progress.tsx";
+import {TagSelector} from "@/pages/admin-page/components/create-post/components/tag-selector";
+import {Lines, NoLines} from "@/lib/quick-tag-by-lines.ts";
+import {Tag} from "@/lib/tags.ts";
 
 interface MenuBarProps {
   editor: Editor | null;
@@ -30,6 +33,7 @@ interface Article {
   title: string;
   description?: string;
   cover?: string;
+  quick_tag: Lines;
 }
 
 interface UploadStatus {
@@ -41,6 +45,8 @@ interface UploadStatus {
 
 export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setImageState, title, setTitle }) => {
   const [desc, setDesc] = useState<string>("");
+  const [quickTags, setQuickTags] = useState<Lines>(NoLines);
+  const [Tags, setTags] = useState<Tag[]>([]);
   const [isPublishing, setIsPublishing] = useState<boolean>(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string>("");
@@ -83,6 +89,8 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
         const doc = parser.parseFromString(content, 'text/html');
         const images = doc.querySelectorAll('img[data-image-id]')
         const totalImages = images.length;
+
+        console.log(images);
 
         let uploadFailures = 0;
 
@@ -178,11 +186,17 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
       // 获取最终内容并提交
       const content = editor.getJSON();
 
+      const common_tag: string[] = Tags.map(tag => tag.label);
+
+      console.log("common_Tag",common_tag);
+      console.log("quick_Tag",quickTags);
+
       const articleData: Article = {
         title: title || "未命名标题",
         description: desc,
         content: content,
         cover: coverImageUrl || undefined,
+        quick_tag: quickTags,
       };
 
       const response = await apiClient.post('/posts', articleData);
@@ -208,6 +222,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
       setCoverImagePreview(previewUrl);
     }
   }
+
 
   return (
     <div className="toolbar flex gap-2 mb-4">
@@ -259,7 +274,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
             <DrawerTitle>确认要发布这篇文章吗</DrawerTitle>
             <DrawerDescription>请确定文章标题和概述</DrawerDescription>
           </DrawerHeader>
-          <div className="p-4">
+          <div className="px-4">
             <input
               type="text"
               value={title}
@@ -273,23 +288,33 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
               placeholder="文章概述"
               className="w-full border rounded-md p-2"
             />
-            <div className="grid w-full max-w-sm items-center gap-1.5">
+            <div className="grid w-full max-w-sm items-center gap-1.5 mt-4">
               <Label htmlFor="picture">文章封面</Label>
-              <Input
-                id="picture"
-                type="file"
-                onChange={handleCoverImageChange}
-              />
-              {coverImagePreview && (
-                <div className="mt-2 w-64 aspect-auto">
-                  <img
-                    src={coverImagePreview}
-                    alt="封面预览"
-                    className="max-h-40 rounded-md border"
-                  />
-                </div>
-              )}
+              <div className="flex items-center gap-4">
+                <Input
+                  id="picture"
+                  type="file"
+                  onChange={handleCoverImageChange}
+                  className="flex-1"
+                />
+                {coverImagePreview && (
+                  <div className="h-30 aspect-auto flex-shrink-0">
+                    <img
+                      src={coverImagePreview}
+                      alt="封面预览"
+                      className="h-full w-full object-cover rounded-md border"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
+            {/*标签选择*/}
+            <TagSelector
+              setQuickTags={setQuickTags}
+              quickTags={quickTags}
+              setTags={setTags}
+              Tags={Tags}
+            />
             {/*上传进度条*/}
             {uploadStatus.uploading && (
               <div className="mt-4 space-y-2">
@@ -320,3 +345,4 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
     </div>
   );
 };
+

@@ -54,6 +54,7 @@ const Tiptap = () => {
         defaultLanguage: 'javascript',
       }),
       CustomImage,
+      // ImageResize,
     ], // 基础功能，如加粗、斜体、列表等
     content: `<p>图片上传测试</p>`,
     editorProps: {
@@ -85,7 +86,7 @@ const Tiptap = () => {
   });
 
   return (
-    <div className={"prose tiptap-editor"}>
+    <div className={"w-3/4 prose tiptap-editor"}>
       <MenuBar
         editor={editor}
         imageState={imageState}
