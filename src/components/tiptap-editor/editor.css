@@ -56,5 +56,9 @@
     h6 {
         @apply text-xl
     }
+
+    p {
+        @apply text-base
+    };
 }
 
