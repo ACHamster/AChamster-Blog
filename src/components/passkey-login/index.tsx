@@ -1,6 +1,6 @@
 // PasskeyLogin.tsx - 用于 Passkey 登录
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { PasskeyService } from '@/lib/passkey.ts';
 import {Button} from "@/components/ui/button.tsx";
 import {KeyRound} from "lucide-react";
@@ -20,8 +20,7 @@ export const PasskeyLogin: React.FC<PasskeyLoginProps> = ({
   const passkeyService = new PasskeyService();
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/';
+  const location = useLocation();
 
   const handleLogin = async () => {
     if (!PasskeyService.isSupported()) {
@@ -34,8 +33,9 @@ export const PasskeyLogin: React.FC<PasskeyLoginProps> = ({
       const result = await passkeyService.login(userId);
       if (result) {
         onSuccess?.();
-        console.log(result);
-        navigate(redirectTo);
+        console.log(location.state?.from?.pathname);
+        const destination = location.state?.from?.pathname;
+        navigate(destination);
       }
     } catch (error) {
       onError?.(error as Error);
