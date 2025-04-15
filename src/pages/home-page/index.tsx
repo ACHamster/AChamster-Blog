@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NavLink, useLocation} from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -34,6 +34,7 @@ interface userInfo {
 
 const HomePage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [totalPosts, setTotalPosts] = useState<number>(0);
   const [userInfo, setUserInfo] = useState<userInfo>();
@@ -159,6 +160,9 @@ const HomePage: React.FC = () => {
                       <DropdownMenuLabel>我的账户</DropdownMenuLabel>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>个人档案</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/passkey-register')}>
+                        绑定 Passkey
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={handleLogout}>退出登录</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -276,3 +280,4 @@ const HomePage: React.FC = () => {
 }
 
 export default HomePage;
+

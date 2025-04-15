@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router"
 import { useLocation } from "react-router";
 import apiClient from "@/lib/api.ts";
+import {PasskeyLogin} from "@/components/passkey-login";
 
 export function LoginForm({
                             className,
@@ -97,6 +98,7 @@ export function LoginForm({
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "登录中..." : "登录"}
                 </Button>
+                <PasskeyLogin userId={1}/>
               </div>
             </div>
           </form>
