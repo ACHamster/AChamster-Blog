@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Input } from "@/components/ui/input";
-import { DataTablePagination } from "../../../../../../components/ui/table-pagination.tsx";
+import { DataTablePagination } from "@/components/ui/table-pagination.tsx";
 
 
 interface DataTableProps<TData, TValue> {

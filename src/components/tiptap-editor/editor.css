@@ -3,8 +3,6 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
-
-
 .tiptap code:not(pre code) {
     @apply bg-[#EDEDEB] rounded-[0.4rem] text-[#DA615C] text-sm px-[0.3em] py-[0.25em];
 }
@@ -59,6 +57,6 @@
 
     p {
         @apply text-base
-    };
+    }
 }
 

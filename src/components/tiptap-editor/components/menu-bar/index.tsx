@@ -1,7 +1,7 @@
 import {Button} from "@/components/ui/button.tsx";
 import {Editor} from "@tiptap/react";
-import React, {useState} from "react";
-import apiClient from "@/lib/api"; // 替换axios导入为apiClient
+import React, {useState, useEffect} from "react";
+import apiClient from "@/lib/api";
 import {
   Drawer,
   DrawerClose,
@@ -19,6 +19,7 @@ import {Progress} from "@/components/ui/progress.tsx";
 import {TagSelector} from "@/pages/admin-page/components/create-post/components/tag-selector";
 import {Lines, NoLines} from "@/lib/quick-tag-by-lines.ts";
 import {Tag} from "@/lib/tags.ts";
+import {useParams} from "react-router";
 
 interface MenuBarProps {
   editor: Editor | null;
@@ -26,14 +27,24 @@ interface MenuBarProps {
   setImageState?: React.Dispatch<React.SetStateAction<Record<string, File>>>;
   title?: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
+  desc?: string;
+  setDesc: React.Dispatch<React.SetStateAction<string>>;
+  quickTags?: Lines;
+  setQuickTags: React.Dispatch<React.SetStateAction<Lines>>;
+  tags?: Tag[];
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
+  coverImageUrl?: string;
+  setCoverImageUrl?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface Article {
+  id?: string;
   content: object;
   title: string;
   description?: string;
   cover?: string;
   quick_tag: Lines;
+  common_tag: string[];
 }
 
 interface UploadStatus {
@@ -43,10 +54,21 @@ interface UploadStatus {
   current: number;
 }
 
-export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setImageState, title, setTitle }) => {
-  const [desc, setDesc] = useState<string>("");
-  const [quickTags, setQuickTags] = useState<Lines>(NoLines);
-  const [Tags, setTags] = useState<Tag[]>([]);
+export const MenuBar: React.FC<MenuBarProps> = ({
+  editor,
+  imageState = {},
+  setImageState,
+  title,
+  setTitle,
+  desc = "",
+  setDesc,
+  quickTags = NoLines,
+  setQuickTags,
+  tags = [],
+  setTags,
+  coverImageUrl = "",
+  setCoverImageUrl
+}) => {
   const [isPublishing, setIsPublishing] = useState<boolean>(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string>("");
@@ -56,6 +78,15 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
     total: 0,
     current: 0
   });
+
+  const params = useParams();
+
+  // 使用useEffect来设��初始值
+  useEffect(() => {
+    if (coverImageUrl) {
+      setCoverImagePreview(coverImageUrl);
+    }
+  }, [coverImageUrl]);
 
   if (!editor) {
     return null;
@@ -151,7 +182,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
       }
 
       // 处理封面图上传
-      let coverImageUrl = "";
+      let finalCoverImageUrl = coverImageUrl; // 使用已有的封面图URL作为默认值
       if (coverImage) {
         setUploadStatus({
           uploading: true,
@@ -161,7 +192,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
         });
 
         try {
-          coverImageUrl = await uploadImageToB2(coverImage);
+          finalCoverImageUrl = await uploadImageToB2(coverImage);
         } catch (error) {
           console.error('封面图上传失败:', error);
           toast("封面图上传失败，请重试");
@@ -186,18 +217,19 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
       // 获取最终内容并提交
       const content = editor.getJSON();
 
-      const common_tag: string[] = Tags.map(tag => tag.label);
-
-      console.log("common_Tag",common_tag);
-      console.log("quick_Tag",quickTags);
+      const common_tag = tags.map(tag => tag.label);
 
       const articleData: Article = {
+        id: params.id || undefined,
         title: title || "未命名标题",
         description: desc,
         content: content,
-        cover: coverImageUrl || undefined,
+        cover: finalCoverImageUrl || undefined,
         quick_tag: quickTags,
+        common_tag: common_tag || [],
       };
+
+      console.log(articleData);
 
       const response = await apiClient.post('/posts', articleData);
 
@@ -220,6 +252,9 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
       setCoverImage(file);
       const previewUrl = URL.createObjectURL(file);
       setCoverImagePreview(previewUrl);
+      if (setCoverImageUrl) {
+        setCoverImageUrl(""); // 清除原来的URL，因为我们有了新的文件
+      }
     }
   }
 
@@ -313,7 +348,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({ editor, imageState = {}, setIm
               setQuickTags={setQuickTags}
               quickTags={quickTags}
               setTags={setTags}
-              Tags={Tags}
+              Tags={tags}
             />
             {/*上传进度条*/}
             {uploadStatus.uploading && (

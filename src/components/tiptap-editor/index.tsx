@@ -9,7 +9,11 @@ import "highlight.js/styles/atom-one-dark-reasonable.css";
 import {BubbleMenu} from "@tiptap/react";
 import {Bold, CodeXml, Italic, Strikethrough} from "lucide-react";
 import './editor.css';
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {fetchPostById} from "@/lib/api.ts";
+import {useParams} from "react-router";
+import {Lines, NoLines} from "@/lib/quick-tag-by-lines.ts";
+import {Tag} from "@/lib/tags.ts";
 
 const lowlight = createLowlight(all);
 
@@ -42,6 +46,11 @@ const CustomImage = Image.extend({
 const Tiptap = () => {
   const [imageState, setImageState] = useState<Record<string, File>>({});
   const [title, setTitle] = useState<string>('');
+  const [desc, setDesc] = useState<string>('');
+  const [quickTags, setQuickTags] = useState<Lines>(NoLines);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [coverImageUrl, setCoverImageUrl] = useState<string>('');
+  const params = useParams();
 
   const editor = useEditor({
     extensions: [
@@ -85,6 +94,46 @@ const Tiptap = () => {
     },
   });
 
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        const result = await fetchPostById(params.id as string);
+        if (result.success) {
+          if (editor && result.data.content) {
+            editor.commands.setContent(JSON.parse(result.data.content));
+          }
+          setTitle(result.data.title || '');
+          setDesc(result.data.description || '');
+
+          // 设置封面图
+          if (result.data.cover) {
+            setCoverImageUrl(result.data.cover);
+          }
+
+          // 设置标签
+          if (result.data.quick_tag) {
+            setQuickTags(result.data.quick_tag);
+          }
+
+          // 设置通用标签
+          if (result.data.common_tag && Array.isArray(result.data.common_tag)) {
+            // 将标签字符串数组转换��Tag对象数组
+            const tagObjects = result.data.common_tag.map((tag: string) => ({ label: tag, value: tag }));
+            setTags(tagObjects);
+          }
+        } else {
+          console.error('Failed to fetch article:', result.error);
+        }
+      } catch (error) {
+        console.error('Failed to fetch article:', error);
+      }
+    };
+
+    if (params.id) {
+      fetchArticle();
+    }
+  }, [params, editor]);
+
   return (
     <div className={"w-3/4 prose tiptap-editor"}>
       <MenuBar
@@ -93,6 +142,14 @@ const Tiptap = () => {
         setImageState={setImageState}
         title={title}
         setTitle={setTitle}
+        desc={desc}
+        setDesc={setDesc}
+        quickTags={quickTags}
+        setQuickTags={setQuickTags}
+        tags={tags}
+        setTags={setTags}
+        coverImageUrl={coverImageUrl}
+        setCoverImageUrl={setCoverImageUrl}
       />
       {/*标题输入框*/}
       <input

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import apiClient from "@/lib/api.ts";
 import { User } from "@/pages/admin-page/components/users-list/componets/table/columns.tsx";
-import {DataTable} from "@/pages/admin-page/components/users-list/componets/table/data-table.tsx";
+import { DataTable } from "@/pages/admin-page/components/users-list/componets/table/data-table.tsx";
 import {columns} from "@/pages/admin-page/components/users-list/componets/table/columns.tsx";
 
 const UserList: React.FC = () => {

@@ -49,7 +49,6 @@ export default function ArticleDetail() {
         const result = await fetchPostById(id as string);
         if (result.success) {
           setPost(result.data);
-          console.log(result.data);
           if (editor && result.data.content) {
             editor.commands.setContent(JSON.parse(result.data.content));
           }

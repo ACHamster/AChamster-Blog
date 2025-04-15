@@ -94,7 +94,7 @@ export const columns = (onDelete: (id: string) => void): ColumnDef<Post>[] => [
                  <DropdownMenuItem
                    className="flex justify-between"
                    onClick={()=>{
-                      console.log("编辑", post);}}
+                      window.location.href = `edit/${post.id}`;}}
                  >
                     <span>编辑</span>
                     <FilePenLine />

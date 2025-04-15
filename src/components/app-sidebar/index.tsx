@@ -3,7 +3,7 @@ import {
   ArrowUpCircleIcon,
   List,
   Contact,
-  LayoutDashboardIcon,
+  LayoutDashboardIcon, Images,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -39,6 +39,11 @@ const data = {
       title: "用户管理",
       url: "/admin/users-list",
       icon: Contact,
+    },
+    {
+      title: "图片管理",
+      url: "/admin/file-list",
+      icon: Images,
     },
   ],
 }
