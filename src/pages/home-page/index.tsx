@@ -239,7 +239,7 @@ const HomePage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <div className="w-32 h-32 mb-4">
                     <img
-                      src="https://img.achamster.live/uploads/1743758178045-36910976_p0.png"
+                      src="https://img.achamster.live/uploads%2F36910976_p0.png"
                       className="w-full h-full rounded-full object-cover"
                       alt="avatar"
                     />
