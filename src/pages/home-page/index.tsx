@@ -20,6 +20,7 @@ interface Post {
   id: string;
   title: string;
   date: string;
+  description: string;
   common_tags?: string[];
   quick_tag: Lines;
   excerpt: string;
@@ -123,7 +124,6 @@ const HomePage: React.FC = () => {
 
   const filteredPosts = quickTags !== NoLines
     ? postList.filter((post) => {
-      console.log(post.quick_tag);
       return includeSomeLine(quickTags, post.quick_tag);
     })
     : postList;
