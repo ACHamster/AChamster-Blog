@@ -4,10 +4,10 @@ import {
   startAuthentication,
   browserSupportsWebAuthn,
 } from '@simplewebauthn/browser';
-import apiClient from './api'; // 导入 apiClient
+import apiClient from './api';
 
 export class PasskeyService {
-  private apiBaseUrl: string;
+  private readonly apiBaseUrl: string;
 
   constructor(baseUrl: string = '/auth') {
     this.apiBaseUrl = baseUrl;

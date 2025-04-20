@@ -121,8 +121,6 @@ export const MenuBar: React.FC<MenuBarProps> = ({
         const images = doc.querySelectorAll('img[data-image-id]')
         const totalImages = images.length;
 
-        console.log(images);
-
         let uploadFailures = 0;
 
         setUploadStatus({

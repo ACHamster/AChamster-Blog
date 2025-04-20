@@ -1,4 +1,3 @@
-// PasskeyRegister.tsx - 用于已登录用户绑定 Passkey
 import React, { useState } from 'react';
 import { PasskeyService } from '@/lib/passkey';
 
