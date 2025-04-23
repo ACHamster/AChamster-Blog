@@ -130,7 +130,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <section className="relative bg-[url('/img/background.png')] bg-cover">
+      <section className="relative bg-[url('/img/background.webp')] bg-cover">
         <div className="w-screen h-screen relative">
           {/* 网站头部 */}
           <header
