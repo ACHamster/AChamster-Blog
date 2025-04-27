@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel, DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu.tsx";
+import ArticleSkeleton from "@/pages/home-page/components/acticle-skeleton";
 import { handleLogout } from "@/lib/utils.ts";
 import { allTags } from "@/lib/tags.ts";
 import { includeSomeLine, Lines, mergeLines, NoLines, removeLine } from "@/lib/quick-tag-by-lines.ts";
@@ -37,10 +38,13 @@ const HomePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [totalPosts, setTotalPosts] = useState<number>(0);
+  const MAX_RETRIES = 3;
+  const RETRY_DELAY = 2000;
+
   const [userInfo, setUserInfo] = useState<userInfo>();
   const [quickTags, setQuickTags] = useState<Lines>(NoLines);
   const [postList, setPostList] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const mainPageRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
@@ -92,33 +96,42 @@ const HomePage: React.FC = () => {
     });
   });
 
-  useEffect(() => {
-    setTotalPosts(postList.length);
-  }, [postList.length]);
 
-  useEffect(() => {
-    const getPosts = async () => {
-      try {
-        const status = await checkLoginStatus();
-        if (status.data.userId === 0) {
-          // 如果未登录，尝试刷新token
-          await refreshToken();
-        }
+  const getPosts = async ( retry = 0) => {
+    try {
+      const status = await checkLoginStatus();
+      if (status.data.userId === 0) {
+        await refreshToken();
+      }
 
-        const info = await apiClient(`/user/info/${status.data.userId}`);
-        setUserInfo(info.data);
+      const info = await apiClient(`/user/info/${status.data.userId}`);
+      setUserInfo(info.data);
 
-        const response = await fetchPosts();
-        console.log(response);
-        if (response.success) {
-          setPostList([...postList, ...response.data]);
-        } else {
-          console.error('Failed to fetch posts:', response.error);
-        }
-      } catch (error) {
+      const response = await fetchPosts();
+      if (response.success && response.data.length > 0) {
+        setPostList(response.data);
+        setIsLoading(false);
+      } else if (retry < MAX_RETRIES) {
+        setTimeout(() => {
+          getPosts(retry + 1);
+        }, RETRY_DELAY);
+      } else {
+        setIsLoading(false);
+        console.error('Failed to fetch posts after multiple retries');
+      }
+    } catch (error) {
+      if (retry < MAX_RETRIES) {
+        setTimeout(() => {
+          getPosts(retry + 1);
+        }, RETRY_DELAY);
+      } else {
+        setIsLoading(false);
         console.error('Failed to fetch posts:', error);
       }
-    };
+    }
+  };
+
+  useEffect(() => {
     getPosts();
   }, []);
 
@@ -227,9 +240,21 @@ const HomePage: React.FC = () => {
             {/* 中间文章列表 */}
             <main className="lg:col-span-14">
               <div className="space-y-6">
-                {filteredPosts.map((post) => (
-                  <ArticleItem post={post} key={post.id}/>
-                ))}
+                {isLoading ? (
+                  <>
+                    <ArticleSkeleton/>
+                    <ArticleSkeleton/>
+                    <ArticleSkeleton/>
+                  </>
+                ) : filteredPosts.length > 0 ? (
+                  filteredPosts.map((post) => (
+                    <ArticleItem post={post} key={post.id}/>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-500">
+                    暂无文章
+                  </div>
+                )}
               </div>
             </main>
 
@@ -252,7 +277,7 @@ const HomePage: React.FC = () => {
                   </NavLink>
                   <div className="text-center mb-6">
                     <span className="block text-gray-600">文章数</span>
-                    <span className="text-2xl font-bold">{totalPosts}</span>
+                    <span className="text-2xl font-bold">{postList.length}</span>
                   </div>
                   <div className="flex justify-center gap-4">
                     <a href="https://github.com/ACHamster" target="_blank" className="hover:animate-svgSpain">
