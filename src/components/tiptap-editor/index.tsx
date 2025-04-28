@@ -4,7 +4,7 @@ import {MenuBar} from "@/components/tiptap-editor/components/menu-bar";
 import Underline from "@tiptap/extension-underline";
 import {CodeBlockLowlight} from "@tiptap/extension-code-block-lowlight";
 import Image from "@tiptap/extension-image";
-import {all, createLowlight} from "lowlight";
+import {common, createLowlight} from "lowlight";
 import "highlight.js/styles/atom-one-dark-reasonable.css";
 import {BubbleMenu} from "@tiptap/react";
 import {Bold, CodeXml, Italic, Strikethrough} from "lucide-react";
@@ -15,7 +15,7 @@ import {useParams} from "react-router";
 import {Lines, NoLines} from "@/lib/quick-tag-by-lines.ts";
 import {Tag} from "@/lib/tags.ts";
 
-const lowlight = createLowlight(all);
+const lowlight = createLowlight(common);
 
 const CustomImage = Image.extend({
   // 添加自定义属性
