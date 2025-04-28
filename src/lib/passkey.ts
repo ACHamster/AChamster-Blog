@@ -1,4 +1,3 @@
-// passkey.ts
 import {
   startRegistration,
   startAuthentication,
@@ -73,8 +72,6 @@ export class PasskeyService {
           withCredentials: true,
         }
       );
-
-      console.log(data);
 
       return data;
     } catch (error) {

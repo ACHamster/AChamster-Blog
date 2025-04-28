@@ -1,4 +1,3 @@
-// PasskeyLogin.tsx - 用于 Passkey 登录
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { PasskeyService } from '@/lib/passkey.ts';
