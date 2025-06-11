@@ -61,7 +61,7 @@ const HomePage: React.FC = () => {
     gsap.to(navRef.current, {
       background: 'rgba(255,255,254,0,7)',
       backdropFilter: 'blur(10px)',
-      color: 'rgb(61,59,59)',
+      // color: 'rgb(61,59,59)',
       scrollTrigger: {
         trigger: mainPageRef.current,
         scrub: true,
@@ -78,22 +78,22 @@ const HomePage: React.FC = () => {
       },
     });
     // 标题及其缩放动画
-    gsap.set(titleRef.current, {
-      x: '44vw',
-      y: '50vh',
-      scale: scaleValue,
-    });
-    gsap.to(titleRef.current, {
-      x: '0',
-      y: '0',
-      scale: 1,
-      duration: 1.5,
-      ease: 'expo.out',
-      scrollTrigger: {
-        trigger: mainPageRef.current,
-        start: 'top+=50px bottom',
-      },
-    });
+    // gsap.set(titleRef.current, {
+    //   x: '44vw',
+    //   y: '50vh',
+    //   scale: scaleValue,
+    // });
+    // gsap.to(titleRef.current, {
+    //   x: '0',
+    //   y: '0',
+    //   scale: 1,
+    //   duration: 1.5,
+    //   ease: 'expo.out',
+    //   scrollTrigger: {
+    //     trigger: mainPageRef.current,
+    //     start: 'top+=50px bottom',
+    //   },
+    // });
   });
 
 
@@ -108,8 +108,8 @@ const HomePage: React.FC = () => {
       setUserInfo(info.data);
 
       const response = await fetchPosts();
-      if (response.success && response.data.length > 0) {
-        setPostList(response.data);
+      if (response.success && response.data.posts.length > 0) {
+        setPostList(response.data.posts);
         setIsLoading(false);
       } else if (retry < MAX_RETRIES) {
         setTimeout(() => {
@@ -143,22 +143,25 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <section className="relative bg-[url('/img/background.webp')] bg-cover">
-        <div className="w-screen h-screen relative">
+      <section className="relative">
+        <div className="w-screen h-screen relative flex flex-col bg-cover bg-[#F7F6F7]"
+              // style={{ backgroundImage: 'url(/img/background.webp)'}}
+        >
           {/* 网站头部 */}
           <header
             ref={navRef}
-            className="flex justify-between w-screen fixed top-0 z-20 ext-slate-50 text-slate-50"
+            className="flex justify-between w-screen fixed top-0 z-20 ext-slate-50 text-slate-50 px-4"
           >
             <div
-              className="left-0 m-2 text-xl  lg:text-2xl font-clash-display font-bold"
+              className="text-slate-950 left-0 m-2 text-xl  lg:text-2xl font-clash-display font-regular"
               ref={titleRef}
             >
               <NavLink to="/">AChamster  Blog</NavLink>
             </div>
-            <nav className="hidden md:flex items-center right-0 m-2  space-x-5 text-lg font-regular font-clash-display">
+            <nav className="hidden md:flex items-center right-0 m-2  space-x-5 text-lg font-regular text-slate-950 font-clash-display">
               <NavLink to="/blog">Blog</NavLink>
               <NavLink to="/about">About</NavLink>
+              {/*<NavLink to="/anime-list">追番列表</NavLink>*/}
               <div className="flex items-center">
                 {userInfo?.username ?
                   <DropdownMenu>
@@ -185,8 +188,12 @@ const HomePage: React.FC = () => {
               </div>
             </nav>
           </header>
-          <div className="cursor-pointer" onClick={scrollHandler}>
-            <img src="/svg/arrow.svg" alt="arrow" className="absolute w-8 h-8 bottom-10 left-1/2" />
+          <div className="flex items-center justify-start mt-76 ml-35">
+            <h1 className="font-clash-display font-medium text-8xl">AChamster Blog</h1>
+          </div>
+          {/*卡片*/}
+          <div className="flex flex-1 justify-start mt-15 ml-35 w-4/5 h-48 border backdrop-blur-lg rounded-lg border-white/30 shadow-lg">
+            <div>施工中...</div>
           </div>
         </div>
       </section>
