@@ -98,14 +98,16 @@ const HomePage: React.FC = () => {
 
 
   const getPosts = async ( retry = 0) => {
-    try {
-      const status = await checkLoginStatus();
-      if (status.data.userId === 0) {
-        await refreshToken();
-      }
+    const status = await checkLoginStatus();
+    if (status.data.userId === 0) {
+      await refreshToken();
+    }
 
-      const info = await apiClient(`/user/info/${status.data.userId}`);
-      setUserInfo(info.data);
+    const info = await apiClient(`/user/info`);
+    setUserInfo(info.data);
+
+    try {
+
 
       const response = await fetchPosts();
       if (response.success && response.data.posts.length > 0) {
@@ -143,7 +145,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <section className="relative">
+      <section className="relative overflow-hidden">
         <div className="w-screen h-screen relative flex flex-col bg-cover bg-[#F7F6F7]"
               // style={{ backgroundImage: 'url(/img/background.webp)'}}
         >
@@ -188,13 +190,129 @@ const HomePage: React.FC = () => {
               </div>
             </nav>
           </header>
-          <div className="flex items-center justify-start mt-76 ml-35">
-            <h1 className="font-clash-display font-medium text-8xl">AChamster Blog</h1>
+          {/* Hero区域重新设计 */}
+          <div className="flex-1 flex flex-col justify-center items-center px-8 lg:px-16 relative">
+            {/* 简化的装饰性背景元素 */}
+            <div className="absolute top-10 right-20 w-40 h-40 rounded-full bg-slate-100/40 blur-3xl"></div>
+            <div className="absolute bottom-20 left-20 w-32 h-32 rounded-full bg-slate-200/30 blur-2xl"></div>
+
+            {/* 主标题区域 */}
+            <div className="relative z-10 mb-12 text-center">
+              <h1 className="font-clash-display mt-20 font-light text-7xl lg:text-9xl tracking-tight text-slate-900 mb-6">
+                AChamster Blog
+              </h1>
+              <div className="w-20 h-0.5 bg-slate-300 mx-auto mb-4"></div>
+            </div>
+
+            {/* 重新设计的信息卡片 */}
+            <div className="relative w-full max-w-6xl">
+              {/* 主卡片容器 */}
+              <div className="bg-white/70 backdrop-blur-2xl rounded-3xl shadow-xl border border-white/60 overflow-hidden">
+                <div className="grid lg:grid-cols-3 min-h-[400px]">
+                  {/* 左侧个人信息区域 */}
+                  <div className="lg:col-span-1 bg-slate-50/50 p-8 flex flex-col justify-center items-center relative">
+                    <div className="relative z-10 text-center w-full">
+                      <div className="relative mb-8">
+                        <img
+                          src="https://img.achamster.live/uploads%2F36910976_p0.png"
+                          alt="avatar"
+                          className="w-28 h-28 rounded-full mx-auto shadow-lg border-4 border-white/80"
+                        />
+                      </div>
+                      <NavLink
+                        to="/about"
+                        className="text-2xl font-medium text-slate-800 hover:text-slate-600 transition-colors duration-300 block mb-3"
+                      >
+                        AChamster
+                      </NavLink>
+
+                      <p className="text-sm text-slate-400 mb-8 leading-relaxed">
+                        前端开发者 · ACGN爱好者
+                      </p>
+
+                      {/* 社交链接 */}
+                      <div className="flex justify-center gap-4">
+                        <a href="https://github.com/ACHamster" target="_blank"
+                           className="w-11 h-11 bg-white/80 rounded-full shadow-sm flex items-center justify-center hover:shadow-md hover:scale-105 transition-all duration-300 border border-slate-100">
+                          <img src="/svg/github-fill.svg" className="w-5 h-5 opacity-70" alt="github"/>
+                        </a>
+                        <a href="https://discord.gg/pT2ebreb" target="_blank"
+                           className="w-11 h-11 bg-white/80 rounded-full shadow-sm flex items-center justify-center hover:shadow-md hover:scale-105 transition-all duration-300 border border-slate-100">
+                          <img src="/svg/discord.svg" className="w-5 h-5 opacity-70" alt="discord"/>
+                        </a>
+                        <a href="mailto:motets_gram_0i@icloud.com"
+                           className="w-11 h-11 bg-white/80 rounded-full shadow-sm flex items-center justify-center hover:shadow-md hover:scale-105 transition-all duration-300 border border-slate-100">
+                          <img src="/svg/mail-fill.svg" className="w-5 h-5 opacity-70" alt="mail"/>
+                        </a>
+                        <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank"
+                           className="w-11 h-11 bg-white/80 rounded-full shadow-sm flex items-center justify-center hover:shadow-md hover:scale-105 transition-all duration-300 border border-slate-100">
+                          <img src="/svg/steam.svg" className="w-5 h-5 opacity-70" alt="steam"/>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 右侧内容区域 */}
+                  <div className="lg:col-span-2 p-8 lg:p-12">
+                    <div className="h-full flex flex-col justify-center">
+                      {/* 标题 */}
+                      <div className="mb-10">
+                        <h3 className="text-3xl font-light text-slate-800 mb-3">关于我</h3>
+                        <div className="w-12 h-0.5 bg-slate-300"></div>
+                      </div>
+
+                      {/* 内容区域 */}
+                      <div className="space-y-8">
+                        {/* 技术 */}
+                        <div className="group">
+                          <div className="flex items-start gap-4 mb-3">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full mt-3 flex-shrink-0"></div>
+                            <div>
+                              <h4 className="text-xl font-medium text-slate-700 mb-2">技术探索</h4>
+                              <p className="text-slate-500 leading-relaxed group-hover:text-slate-600 transition-colors">
+                                电子产品爱好者，虽然现在已经懒得折腾了。对电脑的热爱可能是成为前端工程师的契机。
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 动画 */}
+                        <div className="group">
+                          <div className="flex items-start gap-4 mb-3">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full mt-3 flex-shrink-0"></div>
+                            <div>
+                              <h4 className="text-xl font-medium text-slate-700 mb-2">动画世界</h4>
+                              <p className="text-slate-500 leading-relaxed group-hover:text-slate-600 transition-colors">
+                                大量摄入恋爱喜剧，可以点旁边的按钮看看我的追番列表（实际上在施工中）
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 游戏 */}
+                        <div className="group">
+                          <div className="flex items-start gap-4 mb-3">
+                            <div className="w-2 h-2 bg-slate-400 rounded-full mt-3 flex-shrink-0"></div>
+                            <div>
+                              <h4 className="text-xl font-medium text-slate-700 mb-2">游戏人生</h4>
+                              <p className="text-slate-500 leading-relaxed group-hover:text-slate-600 transition-colors">
+                                没有特定喜欢的类型，反过来说也乐意尝试各种类型的游戏。喜欢的游戏系列是怪物猎人和秋之回忆
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 简化的装饰性阴影 */}
+              <div className="absolute -bottom-4 -right-4 w-full h-full bg-slate-200/20 rounded-3xl -z-10"></div>
+            </div>
           </div>
-          {/*卡片*/}
-          <div className="flex flex-1 justify-start mt-15 ml-35 w-4/5 h-48 border backdrop-blur-lg rounded-lg border-white/30 shadow-lg">
-            <div>施工中...</div>
-          </div>
+
+          {/* 移除旧的卡片代码 */}
         </div>
       </section>
       <section
@@ -276,31 +394,12 @@ const HomePage: React.FC = () => {
                       alt="avatar"
                     />
                   </div>
-                  <NavLink
-                    to="/about"
-                    className="text-lg font-bold hover:text-sky-600 hover:animate-bNavLink mb-4"
-                  >
-                    AChamster
-                  </NavLink>
+
                   <div className="text-center mb-6">
                     <span className="block text-gray-600">文章数</span>
                     <span className="text-2xl font-bold">{postList.length}</span>
                   </div>
-                  <div className="flex justify-center gap-4">
-                    <a href="https://github.com/ACHamster" target="_blank" className="hover:animate-svgSpain">
-                      <img src="/svg/github-fill.svg" className="w-6 h-6" alt="github"/>
-                    </a>
-                    <a href="https://discord.gg/pT2ebreb" target="_blank" className="hover:animate-svgSpain">
-                      <img src="/svg/discord.svg" className="w-6 h-6" alt="discord"/>
-                    </a>
-                    <a href="mailto:motets_gram_0i@icloud.com" className="hover:animate-svgSpain">
-                      <img src="/svg/mail-fill.svg" className="w-6 h-6" alt="mail"/>
-                    </a>
-                    <a href="https://steamcommunity.com/profiles/76561198982850839" target="_blank"
-                       className="hover:animate-svgSpain">
-                      <img src="/svg/steam.svg" className="w-6 h-6" alt="steam"/>
-                    </a>
-                  </div>
+
                 </div>
               </div>
             </aside>

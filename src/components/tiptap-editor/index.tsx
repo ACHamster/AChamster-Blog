@@ -117,7 +117,7 @@ const Tiptap = () => {
 
           // 设置通用标签
           if (result.data.common_tag && Array.isArray(result.data.common_tag)) {
-            // 将标签字符串数组转换��Tag对象数组
+            // 将标签字符串数组转换Tag对象数组
             const tagObjects = result.data.common_tag.map((tag: string) => ({ label: tag, value: tag }));
             setTags(tagObjects);
           }
