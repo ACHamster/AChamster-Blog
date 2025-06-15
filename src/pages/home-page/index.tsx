@@ -97,15 +97,13 @@ const HomePage: React.FC = () => {
   });
 
 
-  const getPosts = async ( retry = 0) => {
-    const status = await checkLoginStatus();
-    if (status.data.userId === 0) {
-      await refreshToken();
-    }
-
+  const fetchAndSetUserInfo = async () => {
+    await checkLoginStatus();
     const info = await apiClient(`/user/info`);
     setUserInfo(info.data);
+  };
 
+  const getPosts = async ( retry = 0) => {
     try {
 
 
@@ -134,6 +132,7 @@ const HomePage: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchAndSetUserInfo();
     getPosts();
   }, []);
 
