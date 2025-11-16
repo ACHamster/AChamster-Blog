@@ -77,23 +77,6 @@ const HomePage: React.FC = () => {
         toggleActions: 'play none none reverse',
       },
     });
-    // 标题及其缩放动画
-    // gsap.set(titleRef.current, {
-    //   x: '44vw',
-    //   y: '50vh',
-    //   scale: scaleValue,
-    // });
-    // gsap.to(titleRef.current, {
-    //   x: '0',
-    //   y: '0',
-    //   scale: 1,
-    //   duration: 1.5,
-    //   ease: 'expo.out',
-    //   scrollTrigger: {
-    //     trigger: mainPageRef.current,
-    //     start: 'top+=50px bottom',
-    //   },
-    // });
   });
 
 
@@ -105,8 +88,6 @@ const HomePage: React.FC = () => {
 
   const getPosts = async ( retry = 0) => {
     try {
-
-
       const response = await fetchPosts();
       if (response.success && response.data.posts.length > 0) {
         setPostList(response.data.posts);
@@ -145,7 +126,7 @@ const HomePage: React.FC = () => {
   return (
     <>
       <section className="relative overflow-hidden">
-        <div className="w-screen h-screen relative flex flex-col bg-cover bg-[#F7F6F7]"
+        <div className="w-screen h-screen relative flex flex-col bg-cover bg-[#F8F8F8]"
               // style={{ backgroundImage: 'url(/img/background.webp)'}}
         >
           {/* 网站头部 */}

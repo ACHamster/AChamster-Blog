@@ -98,7 +98,7 @@ export function LoginForm({
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "登录中..." : "登录"}
                 </Button>
-                <PasskeyLogin userId={1}/>
+                1
               </div>
             </div>
           </form>
