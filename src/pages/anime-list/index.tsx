@@ -62,11 +62,12 @@ const AnimeList: React.FC = () => {
   return (
     <div className="flex justify-center flex-wrap w-full bg-background min-h-screen">
       <h2 className="w-full text-center text-2xl font-bold my-6">
-        Anime List ({flattenedList.length} / {total})
+        Anime List <br/>
+        (共{total}部)
       </h2>
       <div
         ref={parentRef}
-        className="w-3/5 flex flex-col gap-4 pb-8 items-center overflow-y-auto"
+        className="w-3/5 flex flex-col gap-4 pb-8 items-center overflow-y-auto no-scrollbar"
         style={{ height: '80vh' }}
       >
         <div
@@ -93,6 +94,7 @@ const AnimeList: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'flex-start',
+                  padding: '16px 0',
                 }}
               >
                 {isLoaderRow ? (

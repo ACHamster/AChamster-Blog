@@ -142,32 +142,32 @@ const HomePage: React.FC = () => {
             </div>
             <nav className="hidden md:flex items-center right-0 m-2  space-x-5 text-lg font-regular text-slate-950 font-clash-display">
               <NavLink to="/blog">Blog</NavLink>
-              <NavLink to="/about">About</NavLink>
-              {/*<NavLink to="/anime-list">追番列表</NavLink>*/}
-              <div className="flex items-center">
-                {userInfo?.username ?
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <img
-                        src={userInfo?.avatar}
-                        alt="avatar"
-                        className="w-7 h-7 rounded-full"
-                      />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuLabel>我的账户</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>个人档案</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => navigate('/passkey-register')}>
-                        绑定 Passkey
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleLogout}>退出登录</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  :
-                  <NavLink to="/login" state={{ from: location }} replace>登录</NavLink>
-                }
-              </div>
+              {/*<NavLink to="/about">About</NavLink>*/}
+              <NavLink to="/anime-list">追番列表</NavLink>
+              {/*<div className="flex items-center">*/}
+              {/*  {userInfo?.username ?*/}
+              {/*    <DropdownMenu>*/}
+              {/*      <DropdownMenuTrigger>*/}
+              {/*        <img*/}
+              {/*          src={userInfo?.avatar}*/}
+              {/*          alt="avatar"*/}
+              {/*          className="w-7 h-7 rounded-full"*/}
+              {/*        />*/}
+              {/*      </DropdownMenuTrigger>*/}
+              {/*      <DropdownMenuContent>*/}
+              {/*        <DropdownMenuLabel>我的账户</DropdownMenuLabel>*/}
+              {/*        <DropdownMenuSeparator />*/}
+              {/*        <DropdownMenuItem>个人档案</DropdownMenuItem>*/}
+              {/*        <DropdownMenuItem onClick={() => navigate('/passkey-register')}>*/}
+              {/*          绑定 Passkey*/}
+              {/*        </DropdownMenuItem>*/}
+              {/*        <DropdownMenuItem onClick={handleLogout}>退出登录</DropdownMenuItem>*/}
+              {/*      </DropdownMenuContent>*/}
+              {/*    </DropdownMenu>*/}
+              {/*    :*/}
+              {/*    <NavLink to="/login" state={{ from: location }} replace>登录</NavLink>*/}
+              {/*  }*/}
+              {/*</div>*/}
             </nav>
           </header>
           {/* Hero区域重新设计 */}
