@@ -15,41 +15,30 @@ const bangumiListFetcher = async ({ pageParam = 1 }): Promise<PageResult> => {
   const limit = 10;
   const response = await fetchBangumiAnimeList(page, limit);
 
-  const raw: BangumiCollectionItem[] = Array.isArray(response.data)
-    ? response.data
-    : Array.isArray(response.data)
-      ? response.data
-      : [];
+  const raw: BangumiSubject[] = Array.isArray(response.subjects) ? response.subjects : [];
 
   const normalized: AnimeCardProps[] = raw.map((item) => {
-  const subject: BangumiSubject = item.subject ?? {
-    id: item.subject_id ?? 0,
-    name: '',
-  };
-  return {
-    subject_id: item.subject_id ?? subject.id ?? 0,
-    name_origin: subject.name ?? '',
-    name_cn: subject.name_cn ?? subject.name ?? '',
-    // prefer a commonly sized image
-    coverImage: subject.images?.common ?? subject.images?.medium ?? subject.images?.large ?? '',
-    short_summary: subject.short_summary ?? '',
-    // tags from API are objects {name,count,total_cont} — convert to string names
-    tags: Array.isArray(subject.tags)
-      ? subject.tags
-        .map((t: BangumiTag) => (t?.name ?? String(t)))
-        .slice(0, 5)
-      : [],
-  } as AnimeCardProps;
+    return {
+      subject_id: item.subject_id ?? 0,
+      name_origin: item.name ?? '',
+      name_cn: item.name_cn ?? item.name ?? '',
+      coverImage: item.images?.common ?? item.images?.medium ?? item.images?.large ?? '',
+      short_summary: item.short_summary ?? '',
+      tags: Array.isArray(item.tags)
+        ? item.tags
+          .map((t: BangumiTag) => (t?.name ?? String(t)))
+          .slice(0, 5)
+        : [],
+    } as AnimeCardProps;
   });
 
-  const total = response?.total ?? 0;
-  const hasNextPage = total > (page * limit);
+  const hasNextPage = response.hasMore;
   const nextPage = hasNextPage ? page + 1 : undefined;
 
   return {
     data: normalized,
     nextPageParam: nextPage,
-    total: total,
+    total: response.total ?? 0,
   };
 }
 

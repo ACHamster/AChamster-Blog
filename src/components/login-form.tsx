@@ -43,7 +43,6 @@ export function LoginForm({
         password
       });
 
-      console.log(location.state?.from?.pathname);
       // 登录成功，跳转到admin页面
       const destination = location.state?.from?.pathname;
       navigate(destination);

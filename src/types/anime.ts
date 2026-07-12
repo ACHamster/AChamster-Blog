@@ -13,24 +13,24 @@ export interface BangumiTag {
 }
 
 export interface BangumiSubject {
-  id: number;
+  subject_id: number;
   name: string;
   name_cn?: string;
   short_summary?: string;
   images?: BangumiImageSet;
   tags?: BangumiTag[];
-}
-
-export interface BangumiCollectionItem {
-  subject_id?: number;
-  subject?: BangumiSubject;
+  collection?: {
+    comment: string;
+    score: number;
+  };
 }
 
 export interface BangumiApiResponse {
-  data?: BangumiCollectionItem[];
-  total?: number;
-  limit?: number;
-  offset?: number;
+  subjects: BangumiSubject[];
+  total: number;
+  totalPages: number;
+  page: number;
+  hasMore: boolean;
 }
 
 export interface AnimeCardProps {

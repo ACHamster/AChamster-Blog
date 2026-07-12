@@ -1,7 +1,7 @@
 import {BangumiApiResponse} from "@/types/anime.ts";
 
-export const fetchBangumiAnimeList = async (offset: number = 1, limit: number = 10) => {
-  const response = await fetch(`https://api.bgm.tv/v0/users/796189/collections?limit=${limit}&offset=${offset}&type=2`, {});
+export const fetchBangumiAnimeList = async (page: number = 1, limit: number = 10) => {
+  const response = await fetch(`https://api.achamster.com/bangumi/records?limit=${limit}&page=${page}`, {});
   if(!response.ok) {
     throw new Error('API request failed with status ' + response.status);
   }

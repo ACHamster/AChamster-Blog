@@ -194,7 +194,7 @@ const HomePage: React.FC = () => {
                     <div className="relative z-10 text-center w-full">
                       <div className="relative mb-8">
                         <img
-                          src="https://img.achamster.live/uploads%2F36910976_p0.png"
+                          src="https://img.achamster.com/uploads%2F36910976_p0.png"
                           alt="avatar"
                           className="w-28 h-28 rounded-full mx-auto shadow-lg border-4 border-white/80"
                         />
@@ -369,7 +369,7 @@ const HomePage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <div className="w-32 h-32 mb-4">
                     <img
-                      src="https://img.achamster.live/uploads%2F36910976_p0.png"
+                      src="https://img.achamster.com/uploads%2F36910976_p0.png"
                       className="w-full h-full rounded-full object-cover"
                       alt="avatar"
                     />
