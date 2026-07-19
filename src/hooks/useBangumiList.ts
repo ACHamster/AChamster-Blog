@@ -1,5 +1,5 @@
 import {QueryKey, useInfiniteQuery} from "@tanstack/react-query";
-import {AnimeCardProps, BangumiCollectionItem, BangumiSubject, BangumiTag} from "@/types/anime.ts";
+import {AnimeCardProps, BangumiSubject, BangumiTag} from "@/types/anime.ts";
 import {fetchBangumiAnimeList} from "@/lib/api/bangumi.ts";
 
 const ANIME_KEYS: QueryKey = ['animeList', 'infinite'];
