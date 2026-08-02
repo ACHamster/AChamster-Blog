@@ -48,6 +48,8 @@ const HomePage: React.FC = () => {
   const mainPageRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const constructionBannerRef = useRef<HTMLDivElement>(null);
+  const constructionBannerTrackRef = useRef<HTMLDivElement>(null);
   const scrollHandler = () => {
     if (mainPageRef.current) {
       mainPageRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -55,6 +57,30 @@ const HomePage: React.FC = () => {
   };
   gsap.registerPlugin(ScrollTrigger);
   useGSAP(() => {
+    const constructionBanner = constructionBannerRef.current;
+    const constructionBannerTrack = constructionBannerTrackRef.current;
+
+    if (constructionBanner) {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        gsap.set(constructionBanner, { autoAlpha: 1 });
+      } else {
+        gsap.fromTo(
+          constructionBanner,
+          { autoAlpha: 0, y: -14 },
+          { autoAlpha: 1, y: 0, duration: 0.65, ease: 'power2.out' },
+        );
+
+        if (constructionBannerTrack) {
+          gsap.to(constructionBannerTrack, {
+            xPercent: -50,
+            duration: 30,
+            ease: 'none',
+            repeat: -1,
+          });
+        }
+      }
+    }
+
     // 不同设备的缩放倍率
     const scaleValue = window.innerWidth < 768 ? 1.3 : 3;
     // 控制header背景和文字颜色动画
@@ -170,6 +196,30 @@ const HomePage: React.FC = () => {
               {/*</div>*/}
             </nav>
           </header>
+          <div
+            ref={constructionBannerRef}
+            aria-live="polite"
+            className="fixed top-14 z-10 w-full overflow-hidden border-y border-editorial-rail/35 bg-editorial-background/75 py-2.5 opacity-0 backdrop-blur-md"
+          >
+            <div ref={constructionBannerTrackRef} className="flex w-max will-change-transform">
+              {[0, 1].map((copy) => (
+                <div
+                  key={copy}
+                  aria-hidden={copy === 1}
+                  className="flex w-screen shrink-0 items-center justify-around gap-8 px-6 text-editorial-foreground"
+                >
+                  <span className="font-clash-display text-[10px] tracking-[0.24em] text-editorial-muted">
+                    HOME / UNDER REVISION
+                  </span>
+                  <span className="font-editorial-serif text-sm tracking-[0.35em]">施工中</span>
+                  <span className="font-clash-display text-[10px] tracking-[0.18em] text-editorial-accent">
+                    WORK IN PROGRESS
+                  </span>
+                  <span className="hidden font-editorial-serif text-xs text-editorial-muted sm:block">・</span>
+                </div>
+              ))}
+            </div>
+          </div>
           {/* Hero区域重新设计 */}
           <div className="flex-1 flex flex-col justify-center items-center px-8 lg:px-16 relative">
             {/* 简化的装饰性背景元素 */}
@@ -391,4 +441,3 @@ const HomePage: React.FC = () => {
 }
 
 export default HomePage;
-

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router';
 import AnimeCard from "@/components/anime-card";
 import { AnimeCardSkeleton } from "@/components/anime-card/skeleton";
 import { useBangumiList } from "@/hooks/useBangumiList.ts";
@@ -49,13 +50,41 @@ const AnimeList: React.FC = () => {
   // 初始加载时显示加载状态
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center w-full bg-editorial-background min-h-screen">
-        <div className="text-center">
-          <div className="text-2xl font-bold mb-4">Loading...</div>
-          <div className="flex flex-col gap-4 items-center">
-            <AnimeCardSkeleton />
-            <AnimeCardSkeleton />
-            <AnimeCardSkeleton />
+      <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background">
+        <div className="flex h-16 shrink-0 justify-between px-32 py-4 mb-20">
+          <div className="flex items-center gap-5">
+            <Link
+              to="/"
+              className="font-clash-display text-xs tracking-[0.18em] text-editorial-foreground transition-colors hover:text-editorial-accent"
+            >
+              ← HOME
+            </Link>
+            <span className="h-3 w-px bg-editorial-rail/50" aria-hidden="true" />
+            <span className="text-editorial-accent">ARCHIVE / 2026</span>
+          </div>
+          <div className="h-3 w-20 animate-pulse bg-editorial-rail/20" />
+        </div>
+        <div className="flex min-h-0 flex-1 w-full overflow-hidden px-16">
+          <div className="w-44 shrink-0 pt-4 pr-8">
+            <div className="h-44 w-px bg-editorial-rail/40" />
+          </div>
+          <div className="min-h-0 flex-1 overflow-hidden pl-4 pb-8">
+            {[0, 1, 2].map((index) => (
+              <div key={index} className="relative h-[260px] w-full pr-12">
+                <div className="relative h-full w-full max-w-5xl ml-auto">
+                  <AnimeCardSkeleton />
+                  {index < 2 && (
+                    <div
+                      className="absolute -left-12 w-[calc(100%+6rem)] h-px bg-editorial-rail/25"
+                      style={{
+                        top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
+                        transform: 'translateY(-50%)',
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -65,7 +94,16 @@ const AnimeList: React.FC = () => {
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background">
       <div className="flex h-16 shrink-0 px-32 py-4 justify-between col-span-2 mb-20">
-        <div className="text-editorial-accent">ARCHIVE / 2026</div>
+        <div className="flex items-center gap-5">
+          <Link
+            to="/"
+            className="font-clash-display text-xs tracking-[0.18em] text-editorial-foreground transition-colors hover:text-editorial-accent"
+          >
+            ← HOME
+          </Link>
+          <span className="h-3 w-px bg-editorial-rail/50" aria-hidden="true" />
+          <span className="text-editorial-accent">ARCHIVE / 2026</span>
+        </div>
         <div className="font-clash-display font-light text-sm text-editorial-foreground">
           TOTAL / {totalItems}
         </div>
