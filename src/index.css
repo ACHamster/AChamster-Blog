@@ -7,6 +7,14 @@
 @tailwind utilities;
 
 @font-face {
+    font-family: 'WenYuan Serif SC';
+    font-style: normal;
+    font-weight: 200 900;
+    font-display: swap;
+    src: url('/fonts/wen-yuan-serif/WenYuanSerifSCVF.ttf') format('truetype-variations');
+}
+
+@font-face {
     font-family: 'Clash Display';
     font-style: normal;
     font-weight: 200;
@@ -55,16 +63,40 @@
 }
 
 @layer utilities {
+    .font-editorial-serif {
+        font-family: var(--editorial-font-serif);
+    }
+
+    .font-editorial-sans {
+        font-family: var(--editorial-font-sans);
+    }
+
     .font-clash-display {
         font-family: 'Clash Display', sans-serif;
     }
 }
 
 @theme {
+    --font-editorial-serif: var(--editorial-font-serif);
+    --font-editorial-sans: var(--editorial-font-sans);
     --font-clash-display: 'Clash Display', sans-serif;
 }
 
 :root {
+    /* ACGN Archive / Editorial Draft design tokens */
+    --editorial-background: #f3f0ea;
+    --editorial-foreground: #1f3338;
+    --editorial-muted: #526b70;
+    --editorial-accent: #699ea8;
+    --editorial-rail: #99b8ba;
+    --editorial-divider: #c2bdb0;
+    --editorial-panel: rgb(105 158 168 / 10%);
+    --editorial-mark-background: #f1f5f9;
+    --editorial-mark-border: #e2e8f0;
+    --editorial-mark-foreground: #f0f0f0;
+    --editorial-font-serif: 'WenYuan Serif SC', 'Noto Serif SC', 'Songti SC', serif;
+    --editorial-font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
     --radius: 0.625rem;
     --background: #F8F8F8;
     --foreground: oklch(0.145 0 0);
@@ -169,6 +201,16 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+    --color-editorial-background: var(--editorial-background);
+    --color-editorial-foreground: var(--editorial-foreground);
+    --color-editorial-muted: var(--editorial-muted);
+    --color-editorial-accent: var(--editorial-accent);
+    --color-editorial-rail: var(--editorial-rail);
+    --color-editorial-divider: var(--editorial-divider);
+    --color-editorial-panel: var(--editorial-panel);
+    --color-editorial-mark-background: var(--editorial-mark-background);
+    --color-editorial-mark-border: var(--editorial-mark-border);
+    --color-editorial-mark-foreground: var(--editorial-mark-foreground);
     --color-surface: #FFFFFF;    /* 内容区域/卡片色 */
     --color-title: #333333;      /* 正文/标题色 */
     --color-body: #333333;       /* 正文色 */

@@ -24,12 +24,15 @@ const bangumiListFetcher = async ({ pageParam = 1 }): Promise<PageResult> => {
       name_cn: item.name_cn ?? item.name ?? '',
       coverImage: item.images?.common ?? item.images?.medium ?? item.images?.large ?? '',
       short_summary: item.short_summary ?? '',
+      type: item.type,
+      rate: item.rate,
+      release_date: item.release_date,
       tags: Array.isArray(item.tags)
         ? item.tags
           .map((t: BangumiTag) => (t?.name ?? String(t)))
           .slice(0, 5)
         : [],
-    } as AnimeCardProps;
+    };
   });
 
   const hasNextPage = response.hasMore;
