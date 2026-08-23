@@ -50,32 +50,41 @@ const AnimeList: React.FC = () => {
   // 初始加载时显示加载状态
   if (isLoading) {
     return (
-      <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background">
-        <div className="flex h-16 shrink-0 justify-between px-32 py-4 mb-20">
+      <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
+        <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none">
           <div className="flex items-center gap-5">
             <Link
               to="/"
-              className="font-clash-display text-xs tracking-[0.18em] text-editorial-foreground transition-colors hover:text-editorial-accent"
+              className="font-clash-display text-xs tracking-[0.2em] uppercase text-editorial-foreground transition-colors hover:text-editorial-accent"
             >
               ← HOME
             </Link>
-            <span className="h-3 w-px bg-editorial-rail/50" aria-hidden="true" />
-            <span className="text-editorial-accent">ARCHIVE / 2026</span>
+            <span className="h-3 w-px bg-editorial-divider" aria-hidden="true" />
+            <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase">
+              ARCHIVE / 2026
+            </span>
           </div>
-          <div className="h-3 w-20 animate-pulse bg-editorial-rail/20" />
-        </div>
-        <div className="flex min-h-0 flex-1 w-full overflow-hidden px-16">
-          <div className="w-44 shrink-0 pt-4 pr-8">
-            <div className="h-44 w-px bg-editorial-rail/40" />
-          </div>
-          <div className="min-h-0 flex-1 overflow-hidden pl-4 pb-8">
+          <div className="h-3 w-20 animate-pulse bg-stone-200/60 rounded-xs" />
+        </header>
+
+        <div className="flex min-h-0 flex-1 w-full overflow-hidden px-8 md:px-14 lg:px-16">
+          <aside className="w-64 lg:w-72 shrink-0 pt-4 pr-6 select-none animate-pulse">
+            <div className="h-8 w-44 bg-stone-200/80 rounded-xs mb-4 -translate-y-1" />
+            <div className="h-3 w-48 bg-stone-200/50 rounded-xs mb-6" />
+            <div className="space-y-2">
+              <div className="h-3 w-full bg-stone-200/40 rounded-xs" />
+              <div className="h-3 w-4/5 bg-stone-200/40 rounded-xs" />
+            </div>
+          </aside>
+
+          <main className="min-h-0 flex-1 pb-8 overflow-hidden pl-6 lg:pl-10 pt-4">
             {[0, 1, 2].map((index) => (
-              <div key={index} className="relative h-[260px] w-full pr-12">
+              <div key={index} className="relative h-[260px] w-full pr-6 lg:pr-12">
                 <div className="relative h-full w-full max-w-5xl ml-auto">
                   <AnimeCardSkeleton />
                   {index < 2 && (
                     <div
-                      className="absolute -left-12 w-[calc(100%+6rem)] h-px bg-editorial-rail/25"
+                      className="absolute -left-6 w-[calc(100%+3.5rem)] h-px bg-editorial-divider"
                       style={{
                         top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
                         transform: 'translateY(-50%)',
@@ -85,41 +94,54 @@ const AnimeList: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
+          </main>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background">
-      <div className="flex h-16 shrink-0 px-32 py-4 justify-between col-span-2 mb-20">
+    <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
+      {/* 顶部导航 */}
+      <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none">
         <div className="flex items-center gap-5">
           <Link
             to="/"
-            className="font-clash-display text-xs tracking-[0.18em] text-editorial-foreground transition-colors hover:text-editorial-accent"
+            className="font-clash-display text-xs tracking-[0.2em] uppercase text-editorial-foreground transition-colors hover:text-editorial-accent"
           >
             ← HOME
           </Link>
-          <span className="h-3 w-px bg-editorial-rail/50" aria-hidden="true" />
-          <span className="text-editorial-accent">ARCHIVE / 2026</span>
+          <span className="h-3 w-px bg-editorial-divider" aria-hidden="true" />
+          <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase">
+            ARCHIVE / 2026
+          </span>
         </div>
-        <div className="font-clash-display font-light text-sm text-editorial-foreground">
-          TOTAL / {totalItems}
+        <div className="font-clash-display text-xs tracking-[0.18em] text-editorial-muted">
+          TOTAL <span className="text-editorial-foreground font-medium ml-1">/ {totalItems}</span>
         </div>
-      </div>
-      <div className="flex min-h-0 flex-1 w-full overflow-hidden px-16">
-        {/* 左侧侧边栏标题区：固定在左侧 */}
-        <div className="w-44 flex-shrink-0 pt-4 pr-8">
-          <h1 className="text-2xl font-light text-editorial-foreground font-editorial-sans tracking-widest [writing-mode:vertical-rl] pr-4 border-r border-editorial-rail select-none">
+      </header>
+
+      {/* 主体分栏 */}
+      <div className="flex min-h-0 flex-1 w-full overflow-hidden px-8 md:px-14 lg:px-16">
+        {/* 左侧侧边栏：极简杂志标题区 */}
+        <aside className="w-64 lg:w-72 shrink-0 pt-4 pr-6 select-none">
+          <h1 className="text-3xl lg:text-4xl font-normal text-editorial-foreground font-editorial-serif tracking-tight leading-none -translate-y-1 mb-4">
             看过的作品
           </h1>
-        </div>
 
-        {/* 右侧列表区域：占据右侧大部分主要内容 */}
-        <div
+          <div className="font-clash-display text-xs tracking-[0.22em] uppercase text-editorial-muted/80 mb-6">
+            MEDIA &amp; NOVEL ARCHIVE
+          </div>
+
+          <p className="text-xs/relaxed text-editorial-muted font-editorial-sans font-light">
+            收录并记录个人体验过的动画、轻小说及相关作品索引与评分归档。
+          </p>
+        </aside>
+
+        {/* 右侧列表区域：虚拟化长列表 */}
+        <main
           ref={parentRef}
-          className="min-h-0 flex-1 pb-8 overflow-y-auto no-scrollbar pl-4"
+          className="min-h-0 flex-1 pb-8 overflow-y-auto no-scrollbar pl-6 pt-4 lg:pl-10"
         >
           <div
             style={{
@@ -151,20 +173,24 @@ const AnimeList: React.FC = () => {
                   {isLoaderRow ? (
                     hasNextPage ? (
                       <div className="flex items-center justify-center w-full h-full">
-                        <div className="text-lg text-muted">Loading more...</div>
+                        <div className="text-sm font-clash-display tracking-widest uppercase text-editorial-muted">
+                          Loading more...
+                        </div>
                       </div>
                     ) : (
                       <div className="flex items-center justify-center w-full h-full">
-                        <div className="text-lg text-muted">No more data</div>
+                        <div className="text-sm font-clash-display tracking-widest uppercase text-editorial-muted">
+                          End of Archive
+                        </div>
                       </div>
                     )
                   ) : item ? (
-                    <div className="w-full h-full pr-12">
+                    <div className="w-full h-full pr-6 lg:pr-12">
                       <div className="relative w-full max-w-5xl h-full ml-auto">
                         <AnimeCard animeInfo={item} />
                         {virtualRow.index < flattenedList.length - 1 && (
                           <div
-                            className="absolute -left-12 w-[calc(100%+6rem)] h-px bg-editorial-rail/25"
+                            className="absolute -left-6 w-[calc(100%+3.5rem)] h-px bg-editorial-divider"
                             style={{
                               top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
                               transform: 'translateY(-50%)',
@@ -180,9 +206,8 @@ const AnimeList: React.FC = () => {
               );
             })}
           </div>
-        </div>
+        </main>
       </div>
-
     </div>
   );
 };

@@ -6,20 +6,19 @@ interface UnitProps {
   isActive?: boolean;
 }
 
-const Unit: React.FC<UnitProps> = ({letter, isActive = false}) => {
+const Unit: React.FC<UnitProps> = ({ letter, isActive = false }) => {
   return (
-    <div className={`
-    w-8 h-full flex items-center justify-center font-clash-display border-r-1
-    ${
-      isActive
-        ? 'bg-editorial-accent text-white font-medium'
-        : 'bg-editorial-mark-background text-editorial-foreground hover:bg-slate-200'
-    }
-  `}>
+    <div
+      className={`w-7 h-7 flex items-center justify-center font-clash-display text-xs border-r last:border-r-0 border-editorial-mark-border transition-colors ${
+        isActive
+          ? 'bg-editorial-accent text-white font-medium'
+          : 'bg-editorial-mark-background text-editorial-muted hover:bg-stone-200/50'
+      }`}
+    >
       {letter}
     </div>
   );
-}
+};
 
 const SUBJECT_TYPE_MARKERS = [
   { letter: 'A', type: BangumiSubjectType.ANIME },
@@ -35,7 +34,7 @@ interface MarkerProps {
 
 const Marker: React.FC<MarkerProps> = ({ subjectType }) => {
   return (
-    <div className="grid grid-cols-4 grid-row-1 bg-editorial-background w-30 h-8">
+    <div className="flex border border-editorial-mark-border rounded-xs overflow-hidden w-fit">
       {SUBJECT_TYPE_MARKERS.map(({ letter, type }) => (
         <Unit
           key={letter}

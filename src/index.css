@@ -74,6 +74,25 @@
     .font-clash-display {
         font-family: 'Clash Display', sans-serif;
     }
+
+    @keyframes editorial-marquee {
+        0% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .animate-editorial-marquee {
+        display: flex;
+        width: max-content;
+        animation: editorial-marquee 16s linear infinite;
+    }
+
+    .animate-editorial-marquee:hover {
+        animation-play-state: paused;
+    }
 }
 
 @theme {
@@ -83,17 +102,19 @@
 }
 
 :root {
-    /* ACGN Archive / Editorial Draft design tokens */
-    --editorial-background: #f3f0ea;
-    --editorial-foreground: #1f3338;
-    --editorial-muted: #526b70;
-    --editorial-accent: #699ea8;
-    --editorial-rail: #99b8ba;
-    --editorial-divider: #c2bdb0;
-    --editorial-panel: rgb(105 158 168 / 10%);
-    --editorial-mark-background: #f1f5f9;
-    --editorial-mark-border: #e2e8f0;
-    --editorial-mark-foreground: #f0f0f0;
+    /* Editorial Design Tokens (Warm Stone & Refined Cyan-Teal) */
+    --editorial-background: #FAFAF9;      /* Stone 50 微暖纸张底色 */
+    --editorial-foreground: #1C1917;      /* Stone 900 炭黑主标题与强调文本 */
+    --editorial-body: #292524;            /* Stone 800 长文阅读正文 */
+    --editorial-muted: #78716C;           /* Stone 500 次要信息、时间戳、注释 */
+    --editorial-accent: #337E8C;          /* 鲜明矿物青绿（基于 #699EA8 提纯，对比度更高） */
+    --editorial-accent-hover: #225C67;    /* 悬浮交互色 */
+    --editorial-panel: rgba(51, 126, 140, 0.08); /* 轻量面板微透底色 */
+    --editorial-rail: #D6D3D1;            /* Stone 300 结构辅助线 */
+    --editorial-divider: #E7E5E4;         /* Stone 200 列表细线与分割线 */
+    --editorial-mark-background: #EEF6F8; /* 标签微淡青底色 */
+    --editorial-mark-border: #CFE3E7;     /* 标签青绿细边框 */
+    --editorial-mark-foreground: #256673; /* 标签青绿文字 */
     --editorial-font-serif: 'WenYuan Serif SC', 'Noto Serif SC', 'Songti SC', serif;
     --editorial-font-sans: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
@@ -104,7 +125,7 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: #77AABB;
+    --primary: #337E8C;
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
@@ -203,18 +224,20 @@
     --color-sidebar-ring: var(--sidebar-ring);
     --color-editorial-background: var(--editorial-background);
     --color-editorial-foreground: var(--editorial-foreground);
+    --color-editorial-body: var(--editorial-body);
     --color-editorial-muted: var(--editorial-muted);
     --color-editorial-accent: var(--editorial-accent);
+    --color-editorial-accent-hover: var(--editorial-accent-hover);
     --color-editorial-rail: var(--editorial-rail);
     --color-editorial-divider: var(--editorial-divider);
     --color-editorial-panel: var(--editorial-panel);
     --color-editorial-mark-background: var(--editorial-mark-background);
     --color-editorial-mark-border: var(--editorial-mark-border);
     --color-editorial-mark-foreground: var(--editorial-mark-foreground);
-    --color-surface: #FFFFFF;    /* 内容区域/卡片色 */
-    --color-title: #333333;      /* 正文/标题色 */
-    --color-body: #333333;       /* 正文色 */
-    --color-divider: #EFEFEF;    /* 分割线/边框 */
+    --color-surface: #FFFFFF;
+    --color-title: #333333;
+    --color-body: #333333;
+    --color-divider: #EFEFEF;
 }
 
 @utility no-scrollbar {
