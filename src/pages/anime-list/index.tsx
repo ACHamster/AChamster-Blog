@@ -5,32 +5,55 @@ import { AnimeCardSkeleton } from "@/components/anime-card/skeleton";
 import { useBangumiList } from "@/hooks/useBangumiList.ts";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
-const CARD_HEIGHT = 240;
-const ROW_HEIGHT = 260;
+const useResponsiveConfig = () => {
+  const getBreakpointConfig = () => {
+    if (typeof window === 'undefined') {
+      return { columns: 2, rowHeight: 260, cardHeight: 240 };
+    }
+    const isDesktopWide = window.matchMedia('(min-width: 1680px)').matches;
+    const isTabletOrDesktop = window.matchMedia('(min-width: 768px)').matches;
 
-const useResponsiveColumns = (breakpoint = 1680) => {
-  const [columns, setColumns] = useState<number>(() =>
-    typeof window !== 'undefined' ? (window.innerWidth >= breakpoint ? 2 : 1) : 2
-  );
+    if (isDesktopWide) return { columns: 2, rowHeight: 260, cardHeight: 240 };
+    if (isTabletOrDesktop) return { columns: 1, rowHeight: 260, cardHeight: 240 };
+    return { columns: 1, rowHeight: 196, cardHeight: 176 };
+  };
+
+  const [config, setConfig] = useState(getBreakpointConfig);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(`(min-width: ${breakpoint}px)`);
-    const updateColumns = (e: MediaQueryListEvent | MediaQueryList) => {
-      setColumns(e.matches ? 2 : 1);
+    const mediaDesktop = window.matchMedia('(min-width: 1680px)');
+    const mediaTablet = window.matchMedia('(min-width: 768px)');
+
+    const updateConfig = () => {
+      setConfig((prev) => {
+        const next = getBreakpointConfig();
+        if (
+          prev.columns === next.columns &&
+          prev.rowHeight === next.rowHeight &&
+          prev.cardHeight === next.cardHeight
+        ) {
+          return prev;
+        }
+        return next;
+      });
     };
 
-    updateColumns(mediaQuery);
-    mediaQuery.addEventListener('change', updateColumns);
-    return () => mediaQuery.removeEventListener('change', updateColumns);
-  }, [breakpoint]);
+    mediaDesktop.addEventListener('change', updateConfig);
+    mediaTablet.addEventListener('change', updateConfig);
 
-  return columns;
+    return () => {
+      mediaDesktop.removeEventListener('change', updateConfig);
+      mediaTablet.removeEventListener('change', updateConfig);
+    };
+  }, []);
+
+  return config;
 };
 
 const AnimeList: React.FC = () => {
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useBangumiList();
   const parentRef = useRef<HTMLDivElement>(null);
-  const columns = useResponsiveColumns(1680);
+  const { columns, rowHeight, cardHeight } = useResponsiveConfig();
 
   const flattenedList = data?.pages.flatMap(page => page.data) || [];
   const totalItems = data?.pages[0]?.total ?? 0;
@@ -40,7 +63,7 @@ const AnimeList: React.FC = () => {
   const rowVirtualizer = useVirtualizer({
     getScrollElement: () => parentRef.current,
     count: hasNextPage ? totalRows + 1 : totalRows,
-    estimateSize: () => ROW_HEIGHT,
+    estimateSize: () => rowHeight,
     overscan: 3,
   });
 
@@ -72,8 +95,8 @@ const AnimeList: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
-        <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 2xl:px-24 select-none">
-          <div className="flex items-center gap-5">
+        <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40">
+          <div className="flex items-center gap-3 sm:gap-5">
             <Link
               to="/"
               className="font-clash-display text-xs tracking-[0.2em] uppercase text-editorial-foreground transition-colors hover:text-editorial-accent"
@@ -81,15 +104,15 @@ const AnimeList: React.FC = () => {
               ← HOME
             </Link>
             <span className="h-3 w-px bg-editorial-divider" aria-hidden="true" />
-            <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase">
+            <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase truncate">
               ARCHIVE / 2026
             </span>
           </div>
-          <div className="h-3 w-20 animate-pulse bg-stone-200/60 rounded-xs" />
+          <div className="h-3 w-20 animate-pulse bg-stone-200/60 rounded-xs shrink-0" />
         </header>
 
-        <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-8 md:px-14 lg:px-16 2xl:px-24">
-          <aside className="w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none animate-pulse">
+        <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24">
+          <aside className="hidden md:block w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none animate-pulse">
             <div className="h-8 w-44 bg-stone-200/80 rounded-xs mb-4 -translate-y-1" />
             <div className="h-3 w-48 bg-stone-200/50 rounded-xs mb-6" />
             <div className="space-y-2">
@@ -100,7 +123,11 @@ const AnimeList: React.FC = () => {
 
           <main className="min-h-0 w-full md:w-[68%] lg:w-[72%] 2xl:w-[76%] max-w-[1600px] shrink-0 pb-8 overflow-hidden pt-4">
             {[0, 1, 2].map((rowIndex) => (
-              <div key={rowIndex} className="relative h-[260px] w-full">
+              <div
+                key={rowIndex}
+                className="relative w-full"
+                style={{ height: `${rowHeight}px` }}
+              >
                 <div
                   className={`grid gap-6 w-full ${
                     columns === 2 ? 'grid-cols-2' : 'grid-cols-1'
@@ -113,7 +140,7 @@ const AnimeList: React.FC = () => {
                   <div
                     className="absolute left-0 w-full h-px bg-editorial-divider"
                     style={{
-                      top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
+                      top: `${cardHeight + (rowHeight - cardHeight) / 2}px`,
                       transform: 'translateY(-50%)',
                     }}
                   />
@@ -129,8 +156,8 @@ const AnimeList: React.FC = () => {
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
       {/* 顶部导航 */}
-      <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 2xl:px-24 select-none">
-        <div className="flex items-center gap-5">
+      <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40">
+        <div className="flex items-center gap-3 sm:gap-5">
           <Link
             to="/"
             className="font-clash-display text-xs tracking-[0.2em] uppercase text-editorial-foreground transition-colors hover:text-editorial-accent"
@@ -138,19 +165,19 @@ const AnimeList: React.FC = () => {
             ← HOME
           </Link>
           <span className="h-3 w-px bg-editorial-divider" aria-hidden="true" />
-          <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase">
+          <span className="font-clash-display text-xs tracking-[0.16em] text-editorial-accent font-medium uppercase truncate">
             ARCHIVE / 2026
           </span>
         </div>
-        <div className="font-clash-display text-xs tracking-[0.18em] text-editorial-muted">
+        <div className="font-clash-display text-xs tracking-[0.18em] text-editorial-muted shrink-0">
           TOTAL <span className="text-editorial-foreground font-medium ml-1">/ {totalItems}</span>
         </div>
       </header>
 
       {/* 主体分栏 */}
-      <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-8 md:px-14 lg:px-16 2xl:px-24">
-        {/* 左侧侧边栏：极简杂志标题区（向下位移沉降 + 向右微移） */}
-        <aside className="w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none">
+      <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24">
+        {/* 左侧侧边栏：极简杂志标题区（仅桌面端显示） */}
+        <aside className="hidden md:block w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none">
           <h1 className="text-3xl lg:text-4xl 2xl:text-[40px] font-normal text-editorial-foreground font-editorial-serif tracking-tight leading-none -translate-y-1 mb-4">
             看过的作品
           </h1>
@@ -228,7 +255,7 @@ const AnimeList: React.FC = () => {
                         <div
                           className="absolute left-0 w-full h-px bg-editorial-divider"
                           style={{
-                            top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
+                            top: `${cardHeight + (rowHeight - cardHeight) / 2}px`,
                             transform: 'translateY(-50%)',
                           }}
                         />
