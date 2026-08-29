@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import AnimeCard from "@/components/anime-card";
 import { AnimeCardSkeleton } from "@/components/anime-card/skeleton";
@@ -8,19 +8,40 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 const CARD_HEIGHT = 240;
 const ROW_HEIGHT = 260;
 
+const useResponsiveColumns = (breakpoint = 1680) => {
+  const [columns, setColumns] = useState<number>(() =>
+    typeof window !== 'undefined' ? (window.innerWidth >= breakpoint ? 2 : 1) : 2
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(`(min-width: ${breakpoint}px)`);
+    const updateColumns = (e: MediaQueryListEvent | MediaQueryList) => {
+      setColumns(e.matches ? 2 : 1);
+    };
+
+    updateColumns(mediaQuery);
+    mediaQuery.addEventListener('change', updateColumns);
+    return () => mediaQuery.removeEventListener('change', updateColumns);
+  }, [breakpoint]);
+
+  return columns;
+};
+
 const AnimeList: React.FC = () => {
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } = useBangumiList();
   const parentRef = useRef<HTMLDivElement>(null);
+  const columns = useResponsiveColumns(1680);
 
   const flattenedList = data?.pages.flatMap(page => page.data) || [];
   const totalItems = data?.pages[0]?.total ?? 0;
+  const totalRows = Math.ceil(flattenedList.length / columns);
 
-  // 使用实际数据长度 + overscan，如果还有下一页则 +1 用于显示加载指示器
+  // 使用行数虚拟化，如果还有下一页则 +1 用于显示加载指示器
   const rowVirtualizer = useVirtualizer({
     getScrollElement: () => parentRef.current,
-    count: hasNextPage ? flattenedList.length + 1 : flattenedList.length,
+    count: hasNextPage ? totalRows + 1 : totalRows,
     estimateSize: () => ROW_HEIGHT,
-    overscan: 5, // 预渲染5个额外项，提升滚动体验
+    overscan: 3,
   });
 
   const virtualItems = rowVirtualizer.getVirtualItems();
@@ -31,9 +52,9 @@ const AnimeList: React.FC = () => {
 
     if (!lastItem) return;
 
-    // 当滚动到最后一项且还有下一页且没有正在加载时，触发加载
+    // 当滚动到最后一行且还有下一页且没有正在加载时，触发加载
     if (
-      lastItem.index >= flattenedList.length - 1 &&
+      lastItem.index >= totalRows - 1 &&
       hasNextPage &&
       !isFetchingNextPage
     ) {
@@ -42,7 +63,7 @@ const AnimeList: React.FC = () => {
   }, [
     hasNextPage,
     fetchNextPage,
-    flattenedList.length,
+    totalRows,
     isFetchingNextPage,
     virtualItems,
   ]);
@@ -51,7 +72,7 @@ const AnimeList: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
-        <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none">
+        <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 2xl:px-24 select-none">
           <div className="flex items-center gap-5">
             <Link
               to="/"
@@ -67,8 +88,8 @@ const AnimeList: React.FC = () => {
           <div className="h-3 w-20 animate-pulse bg-stone-200/60 rounded-xs" />
         </header>
 
-        <div className="flex min-h-0 flex-1 w-full overflow-hidden px-8 md:px-14 lg:px-16">
-          <aside className="w-64 lg:w-72 shrink-0 pt-4 pr-6 select-none animate-pulse">
+        <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-8 md:px-14 lg:px-16 2xl:px-24">
+          <aside className="w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none animate-pulse">
             <div className="h-8 w-44 bg-stone-200/80 rounded-xs mb-4 -translate-y-1" />
             <div className="h-3 w-48 bg-stone-200/50 rounded-xs mb-6" />
             <div className="space-y-2">
@@ -77,21 +98,26 @@ const AnimeList: React.FC = () => {
             </div>
           </aside>
 
-          <main className="min-h-0 flex-1 pb-8 overflow-hidden pl-6 lg:pl-10 pt-4">
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="relative h-[260px] w-full pr-6 lg:pr-12">
-                <div className="relative h-full w-full max-w-5xl ml-auto">
+          <main className="min-h-0 w-full md:w-[68%] lg:w-[72%] 2xl:w-[76%] max-w-[1600px] shrink-0 pb-8 overflow-hidden pt-4">
+            {[0, 1, 2].map((rowIndex) => (
+              <div key={rowIndex} className="relative h-[260px] w-full">
+                <div
+                  className={`grid gap-6 w-full ${
+                    columns === 2 ? 'grid-cols-2' : 'grid-cols-1'
+                  }`}
+                >
                   <AnimeCardSkeleton />
-                  {index < 2 && (
-                    <div
-                      className="absolute -left-6 w-[calc(100%+3.5rem)] h-px bg-editorial-divider"
-                      style={{
-                        top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
-                        transform: 'translateY(-50%)',
-                      }}
-                    />
-                  )}
+                  {columns === 2 && <AnimeCardSkeleton />}
                 </div>
+                {rowIndex < 2 && (
+                  <div
+                    className="absolute left-0 w-full h-px bg-editorial-divider"
+                    style={{
+                      top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
+                      transform: 'translateY(-50%)',
+                    }}
+                  />
+                )}
               </div>
             ))}
           </main>
@@ -103,7 +129,7 @@ const AnimeList: React.FC = () => {
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
       {/* 顶部导航 */}
-      <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none">
+      <header className="flex h-16 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 2xl:px-24 select-none">
         <div className="flex items-center gap-5">
           <Link
             to="/"
@@ -122,10 +148,10 @@ const AnimeList: React.FC = () => {
       </header>
 
       {/* 主体分栏 */}
-      <div className="flex min-h-0 flex-1 w-full overflow-hidden px-8 md:px-14 lg:px-16">
-        {/* 左侧侧边栏：极简杂志标题区 */}
-        <aside className="w-64 lg:w-72 shrink-0 pt-4 pr-6 select-none">
-          <h1 className="text-3xl lg:text-4xl font-normal text-editorial-foreground font-editorial-serif tracking-tight leading-none -translate-y-1 mb-4">
+      <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-8 md:px-14 lg:px-16 2xl:px-24">
+        {/* 左侧侧边栏：极简杂志标题区（向下位移沉降 + 向右微移） */}
+        <aside className="w-72 lg:w-80 2xl:w-96 shrink-0 pt-16 lg:pt-20 2xl:pt-28 pl-0 lg:pl-4 2xl:pl-10 pr-6 select-none">
+          <h1 className="text-3xl lg:text-4xl 2xl:text-[40px] font-normal text-editorial-foreground font-editorial-serif tracking-tight leading-none -translate-y-1 mb-4">
             看过的作品
           </h1>
 
@@ -133,7 +159,7 @@ const AnimeList: React.FC = () => {
             MEDIA &amp; NOVEL ARCHIVE
           </div>
 
-          <p className="text-xs/relaxed text-editorial-muted font-editorial-sans font-light">
+          <p className="text-xs/relaxed 2xl:text-[13px] text-editorial-muted font-editorial-sans font-light">
             收录并记录个人体验过的动画、轻小说及相关作品索引与评分归档。
           </p>
         </aside>
@@ -141,7 +167,7 @@ const AnimeList: React.FC = () => {
         {/* 右侧列表区域：虚拟化长列表 */}
         <main
           ref={parentRef}
-          className="min-h-0 flex-1 pb-8 overflow-y-auto no-scrollbar pl-6 pt-4 lg:pl-10"
+          className="min-h-0 w-full md:w-[68%] lg:w-[72%] 2xl:w-[76%] max-w-[1600px] shrink-0 pb-8 overflow-y-auto no-scrollbar pt-4"
         >
           <div
             style={{
@@ -151,8 +177,9 @@ const AnimeList: React.FC = () => {
             }}
           >
             {virtualItems.map((virtualRow) => {
-              const isLoaderRow = virtualRow.index > flattenedList.length - 1;
-              const item = flattenedList[virtualRow.index];
+              const isLoaderRow = virtualRow.index > totalRows - 1;
+              const startIndex = virtualRow.index * columns;
+              const rowItems = flattenedList.slice(startIndex, startIndex + columns);
 
               return (
                 <div
@@ -184,23 +211,29 @@ const AnimeList: React.FC = () => {
                         </div>
                       </div>
                     )
-                  ) : item ? (
-                    <div className="w-full h-full pr-6 lg:pr-12">
-                      <div className="relative w-full max-w-5xl h-full ml-auto">
-                        <AnimeCard animeInfo={item} />
-                        {virtualRow.index < flattenedList.length - 1 && (
-                          <div
-                            className="absolute -left-6 w-[calc(100%+3.5rem)] h-px bg-editorial-divider"
-                            style={{
-                              top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
-                              transform: 'translateY(-50%)',
-                            }}
-                          />
-                        )}
-                      </div>
-                    </div>
                   ) : (
-                    <AnimeCardSkeleton />
+                    <div className="relative w-full h-full">
+                      <div
+                        className={`grid gap-6 w-full ${
+                          columns === 2 ? 'grid-cols-2' : 'grid-cols-1'
+                        }`}
+                      >
+                        {rowItems.map((item) => (
+                          <div key={item.subject_id} className="w-full">
+                            <AnimeCard animeInfo={item} />
+                          </div>
+                        ))}
+                      </div>
+                      {virtualRow.index < totalRows - 1 && (
+                        <div
+                          className="absolute left-0 w-full h-px bg-editorial-divider"
+                          style={{
+                            top: `${CARD_HEIGHT + (ROW_HEIGHT - CARD_HEIGHT) / 2}px`,
+                            transform: 'translateY(-50%)',
+                          }}
+                        />
+                      )}
+                    </div>
                   )}
                 </div>
               );

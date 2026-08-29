@@ -11,6 +11,14 @@ import {
   NoLines,
   removeLine,
 } from '@/lib/quick-tag-by-lines.ts';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { SlidersHorizontal, Search } from 'lucide-react';
 
 interface Post {
   id: string;
@@ -85,7 +93,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
       {/* 顶部导航：增高高度、加大字体、网站标题使用 Clash Display */}
-      <header className="flex h-20 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none border-b border-editorial-divider/40">
+      <header className="flex h-20 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40">
         <div className="flex items-center gap-4">
           <NavLink
             to="/"
@@ -111,10 +119,10 @@ const HomePage: React.FC = () => {
         </nav>
       </header>
 
-      {/* 主体分栏 */}
-      <div className="flex min-h-0 flex-1 w-full overflow-hidden px-8 md:px-14 lg:px-16">
-        {/* 左侧侧边栏：大标题置顶 + 个人档案 + 杂志风分类索引 + 施工滚动横幅 */}
-        <aside className="w-72 lg:w-80 shrink-0 pt-6 pr-6 pb-6 select-none overflow-y-auto no-scrollbar flex flex-col justify-between border-r border-editorial-divider/40">
+      {/* 主体分栏：开启 justify-between 两端对齐 */}
+      <div className="flex min-h-0 flex-1 w-full justify-between overflow-hidden px-8 md:px-14 lg:px-16 2xl:px-24">
+        {/* 左侧侧边栏：独立左栏视觉锚点 */}
+        <aside className="w-84 lg:w-80 shrink-0 pt-6 pr-6 pb-6 select-none overflow-y-auto no-scrollbar flex flex-col justify-between">
           <div className="space-y-5">
             {/* 页面主标题区 */}
             <div>
@@ -278,9 +286,9 @@ const HomePage: React.FC = () => {
           </div>
         </aside>
 
-        {/* 右侧列表区域：文章流（首个item pt-0，实现与左侧“最新文章”横向平齐） */}
-        <main className="min-h-0 flex-1 pb-8 overflow-y-auto no-scrollbar pl-6 pt-6 lg:pl-10">
-          <div className="max-w-4xl">
+        {/* 右侧列表区域：比例调整为 66%，使中间流体空隙保持在 25% 左右，与 hitorigocochi 完全对齐 */}
+        <main className="min-h-0 w-full md:w-[62%] lg:w-[64%] 2xl:w-[66%] max-w-[1600px] shrink-0 pb-8 overflow-y-auto no-scrollbar pt-6">
+          <div className="w-full">
             {/* 文章列表 */}
             {isLoading ? (
               <div>
