@@ -321,6 +321,16 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
+      <title>AChamster Blog - 思考、技术与生活随笔</title>
+      <meta name="description" content="AChamster 个人技术博客，记录前端、全栈开发心得与生活感悟。" />
+      <link rel="canonical" href="https://achamster.com/" />
+      <meta property="og:site_name" content="AChamster Blog" />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="AChamster Blog - 思考、技术与生活随笔" />
+      <meta property="og:description" content="AChamster 个人技术博客，记录前端、全栈开发心得与生活感悟。" />
+      <meta property="og:url" content="https://achamster.com/" />
+      <meta property="og:image" content="https://achamster.com/img/background.webp" />
+
       {/* 顶部导航：Header 设为 z-50，确保汉堡按钮始终置顶 */}
       <header className="relative z-50 flex h-16 md:h-20 shrink-0 items-center justify-between px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40 bg-editorial-background/95 backdrop-blur-xs">
         <div className="flex items-center gap-4">

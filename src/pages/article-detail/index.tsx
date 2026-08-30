@@ -84,9 +84,50 @@ export default function ArticleDetail() {
 
   // 获取标签列表（兼容 common_tag 与 common_tags）
   const tags = post?.common_tags || post?.common_tag || [];
+  const canonicalUrl = `https://achamster.com/blog/${id}`;
+  const coverUrl = post?.cover || 'https://achamster.com/img/background.webp';
 
   return (
     <div className="min-h-screen w-full bg-editorial-background text-editorial-foreground flex flex-col">
+      <title>{post?.title ? `${post.title} - AChamster Blog` : 'AChamster Blog'}</title>
+      {post?.description && <meta name="description" content={post.description} />}
+      <link rel="canonical" href={canonicalUrl} />
+
+      {/* Open Graph */}
+      <meta property="og:site_name" content="AChamster Blog" />
+      <meta property="og:type" content="article" />
+      <meta property="og:title" content={post?.title || 'AChamster Blog'} />
+      {post?.description && <meta property="og:description" content={post.description} />}
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content={coverUrl} />
+
+      {/* Twitter Card */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={post?.title || 'AChamster Blog'} />
+      {post?.description && <meta name="twitter:description" content={post.description} />}
+      <meta name="twitter:image" content={coverUrl} />
+
+      {/* 结构化数据 (JSON-LD) */}
+      {post && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'BlogPosting',
+              headline: post.title,
+              description: post.description || '',
+              image: [coverUrl],
+              author: {
+                '@type': 'Person',
+                name: 'AChamster',
+                url: 'https://achamster.com',
+              },
+            }).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026'),
+          }}
+        />
+      )}
+
       {/* 顶部导航 */}
       <header className="flex h-20 shrink-0 items-center justify-between px-8 md:px-14 lg:px-16 select-none border-b border-editorial-divider/40">
         <div className="flex items-center gap-4">

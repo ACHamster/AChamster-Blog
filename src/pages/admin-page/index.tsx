@@ -8,6 +8,10 @@ import {Outlet} from "react-router";
 const AdminPage: React.FC = () => {
   return (
     <SidebarProvider>
+      {/* 阻止搜索引擎爬虫收录后台管理系统 */}
+      <title>管理后台 - AChamster Blog</title>
+      <meta name="robots" content="noindex, nofollow" />
+
       <AppSidebar />
       <SidebarInset>
         <SiteHeader />

@@ -91,10 +91,24 @@ const AnimeList: React.FC = () => {
     virtualItems,
   ]);
 
+  // SEO meta 标签（loading 和正常渲染共用）
+  const seoMeta = (
+    <>
+      <title>看过的作品 - AChamster Blog</title>
+      <meta name="description" content="收录并记录个人体验过的动画、轻小说及相关作品索引与评分归档。" />
+      <link rel="canonical" href="https://achamster.com/anime-list" />
+      <meta property="og:title" content="看过的作品 - AChamster Blog" />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content="https://achamster.com/anime-list" />
+    </>
+  );
+
   // 初始加载时显示加载状态
   if (isLoading) {
     return (
       <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
+        {seoMeta}
+
         <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40">
           <div className="flex items-center gap-3 sm:gap-5">
             <Link
@@ -155,6 +169,8 @@ const AnimeList: React.FC = () => {
 
   return (
     <div className="flex h-[100dvh] w-full flex-col overflow-hidden bg-editorial-background text-editorial-foreground">
+      {seoMeta}
+
       {/* 顶部导航 */}
       <header className="flex h-16 shrink-0 items-center justify-between px-4 sm:px-8 md:px-14 lg:px-16 2xl:px-24 select-none border-b border-editorial-divider/40">
         <div className="flex items-center gap-3 sm:gap-5">
