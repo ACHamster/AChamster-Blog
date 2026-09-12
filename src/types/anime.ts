@@ -4,6 +4,8 @@ export enum BangumiSubjectType {
   MUSIC = 3,
   GAME = 4,
   REAL = 6,
+  COMIC = 11,
+  NOVEL = 12,
 }
 export interface BangumiImageSet {
   large?: string;

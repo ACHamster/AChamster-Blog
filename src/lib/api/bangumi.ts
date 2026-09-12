@@ -1,9 +1,10 @@
-import {BangumiApiResponse} from "@/types/anime.ts";
+import { BangumiApiResponse } from "@/types/anime.ts";
+import apiClient from "@/lib/api.ts";
 
-export const fetchBangumiAnimeList = async (page: number = 1, limit: number = 10) => {
-  const response = await fetch(`https://api.achamster.com/bangumi/records?limit=${limit}&page=${page}`, {});
-  if(!response.ok) {
-    throw new Error('API request failed with status ' + response.status);
-  }
-  return response.json() as Promise<BangumiApiResponse>
-}
+export const fetchBangumiAnimeList = async (page: number = 1, limit: number = 10): Promise<BangumiApiResponse> => {
+  const response = await apiClient.get<BangumiApiResponse>('/bangumi/records', {
+    params: { limit, page },
+  });
+  return response.data;
+};
+
