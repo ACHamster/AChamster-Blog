@@ -70,26 +70,31 @@ const Tiptap = () => {
       handlePaste: (view, event) => {
         if (!event.clipboardData) return false;
 
-        const files = event.clipboardData.files;
-        for (const file of files) {
-          if (file.type.startsWith('image/')) {
-            const imageId = `img_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            const tempUrl = URL.createObjectURL(file);
+        const files = Array.from(event.clipboardData.files);
+        const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+        if (imageFiles.length === 0) return false;
 
-            // 插入图片节点
-            const node = view.state.schema.nodes.image.create({
-              src: tempUrl,
-              imageId: imageId,
-            });
-            const transaction = view.state.tr.replaceSelectionWith(node);
-            view.dispatch(transaction);
+        const newImages: Record<string, File> = {};
+        let tr = view.state.tr;
 
-            // 存储图片文件
-            setImageState((prev) => ({ ...prev, [imageId]: file }));
-            return true;
-          }
-        }
-        return false;
+        imageFiles.forEach((file, idx) => {
+          const imageId = `img_${Date.now()}_${idx}_${Math.random().toString(36).substr(2, 9)}`;
+          const tempUrl = URL.createObjectURL(file);
+
+          // 插入图片节点
+          const node = view.state.schema.nodes.image.create({
+            src: tempUrl,
+            imageId: imageId,
+          });
+          tr = tr.replaceSelectionWith(node);
+          newImages[imageId] = file;
+        });
+
+        view.dispatch(tr);
+
+        // 存储图片文件
+        setImageState((prev) => ({ ...prev, ...newImages }));
+        return true;
       },
     },
   });
@@ -192,4 +197,3 @@ const Tiptap = () => {
 };
 
 export default Tiptap;
-
