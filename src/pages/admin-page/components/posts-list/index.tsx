@@ -4,9 +4,12 @@ import {DataTable} from "@/pages/admin-page/components/posts-list/componets/tabl
 import {columns, Post} from "@/pages/admin-page/components/posts-list/componets/table/columns.tsx";
 
 const getPosts = async (): Promise<Post[]> => {
-  const response = await apiClient('/posts/list');
-  return response.data;
-}
+  const response = await apiClient.get('/posts/list');
+  if (Array.isArray(response.data)) {
+    return response.data;
+  }
+  return response.data?.posts ?? [];
+};
 
 const PostsList :React.FC = () => {
   const [data, setData] = useState<Post[]>([]);
